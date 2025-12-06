@@ -1,0 +1,89 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { PostInputQuery } from '../../api/input-dto/get-posts-query-params.input-dto';
+import {
+  PostsViewPaginated,
+  PostViewModel,
+} from '../../api/view-dto/posts.view-dto';
+import { Post, PostDocument } from '../../domain/post.entity';
+import { PostLikesRepository } from '../posts.likes-repository';
+
+@Injectable()
+export class PostsQueryRepository {
+  constructor(
+    @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
+    private readonly postLikesRepository: PostLikesRepository,
+  ) {}
+
+  async getAllPosts(
+    params: PostInputQuery,
+    userId?: string,
+  ): Promise<PostsViewPaginated> {
+    const [totalCount, posts] = await Promise.all([
+      this.postModel.countDocuments({}),
+      this.postModel
+        .find({})
+        .sort(params.SortOptions(params.sortBy))
+        .skip(params.calculateSkip())
+        .limit(params.pageSize)
+        .lean(),
+    ]);
+
+    const items = await this.postLikesRepository.enrichPostsWithLikes(
+      posts,
+      userId,
+    );
+
+    return PostsViewPaginated.mapToView({
+      items,
+      page: params.pageNumber,
+      size: params.pageSize,
+      totalCount,
+    });
+  }
+
+  async getPostByIdOrError(
+    id: string,
+    userId?: string,
+  ): Promise<PostViewModel> {
+    const result = await this.postModel.findById(id).lean();
+    if (!result) throw new NotFoundException('Post not found');
+
+    const items = await this.postLikesRepository.enrichPostsWithLikes(
+      [result],
+      userId,
+    );
+    return items[0];
+  }
+
+  async getPostsByBlogId(
+    id: string,
+    params: PostInputQuery,
+    userId?: string,
+  ): Promise<PostsViewPaginated> {
+    const filter = { blogId: id };
+
+    const [totalCount, posts] = await Promise.all([
+      this.postModel.countDocuments(filter),
+      this.postModel
+        .find(filter)
+        .sort(params.SortOptions(params.sortBy))
+        .skip(params.calculateSkip())
+        .limit(params.pageSize)
+        .lean(),
+    ]);
+
+    const items = await this.postLikesRepository.enrichPostsWithLikes(
+      posts,
+      userId,
+    );
+
+    return PostsViewPaginated.mapToView({
+      items,
+      page: params.pageNumber,
+      size: params.pageSize,
+      totalCount,
+    });
+  }
+}
