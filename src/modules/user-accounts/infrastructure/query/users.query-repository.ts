@@ -17,10 +17,14 @@ export class UsersQueryRepository {
   async getAllUsers(params: UserInputQuery): Promise<UsersViewPaginated> {
     const filter: Record<string, unknown> = {}; //а что тут делать, есть какой то FilterQuery<UserDocument> но он не хочет работать и почему ?
 
-    if (params.searchLoginTerm) {
+    if (params.searchLoginTerm && params.searchEmailTerm) {
+      filter.$or = [
+        { login: { $regex: params.searchLoginTerm, $options: 'i' } },
+        { email: { $regex: params.searchEmailTerm, $options: 'i' } },
+      ];
+    } else if (params.searchLoginTerm) {
       filter.login = { $regex: params.searchLoginTerm, $options: 'i' };
-    }
-    if (params.searchEmailTerm) {
+    } else if (params.searchEmailTerm) {
       filter.email = { $regex: params.searchEmailTerm, $options: 'i' };
     }
 
