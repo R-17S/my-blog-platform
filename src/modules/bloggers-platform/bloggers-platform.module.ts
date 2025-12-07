@@ -51,12 +51,12 @@ import { Module } from '@nestjs/common';
     CommentLikesRepository,
   ],
   exports: [
-    // BlogsRepository,
-    // BlogsService,
-    // PostsRepository,
-    // PostsService,
-    // CommentsRepository,
-    // CommentsQueryRepository,
+    BlogsRepository,
+    BlogsService,
+    PostsRepository,
+    PostsService,
+    CommentsRepository,
+    CommentsQueryRepository,
   ],
 })
 export class BloggersPlatformModule {}
