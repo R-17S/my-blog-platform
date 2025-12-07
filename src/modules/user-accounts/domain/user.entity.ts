@@ -52,9 +52,8 @@ export class User {
    */
   makeDeleted() {
     if (this.deletedAt !== null) {
-      throw new Error('User already deleted');
+      this.deletedAt = new Date();
     }
-    this.deletedAt = new Date();
   }
 }
 
