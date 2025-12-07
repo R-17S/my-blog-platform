@@ -15,7 +15,7 @@ export class UsersQueryRepository {
   ) {}
 
   async getAllUsers(params: UserInputQuery): Promise<UsersViewPaginated> {
-    const filter: Record<string, unknown> = {}; //а что тут делать, есть какой то FilterQuery<UserDocument> но он не хочет работать и почему ?
+    const filter: Record<string, unknown> = { deletedAt: null }; //а что тут делать, есть какой то FilterQuery<UserDocument> но он не хочет работать и почему ?
 
     if (params.searchLoginTerm && params.searchEmailTerm) {
       filter.$or = [
