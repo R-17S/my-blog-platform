@@ -49,7 +49,9 @@ export class CommentsQueryRepository {
     id: string,
     userId?: string,
   ): Promise<CommentViewModel> {
-    const result = await this.commentModel.findById(id).lean();
+    const result = await this.commentModel
+      .findOne({ _id: id, deletedAt: null }) // фильтруем только "живые" блоги
+      .lean();
     if (!result) throw new NotFoundException('Comment not found');
 
     const statusesMap = userId

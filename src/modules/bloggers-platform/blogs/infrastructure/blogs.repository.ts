@@ -14,7 +14,11 @@ export class BlogsRepository {
   }
 
   async findById(id: string): Promise<BlogDocument | null> {
-    return this.blogModel.findById(id);
+    if (!Types.ObjectId.isValid(id)) return null;
+    return this.blogModel.findOne({
+      _id: new Types.ObjectId(id),
+      deletedAt: null,
+    });
   }
 
   async getBlogNameOrError(id: string): Promise<string> {

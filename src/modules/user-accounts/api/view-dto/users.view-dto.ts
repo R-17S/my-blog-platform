@@ -1,4 +1,4 @@
-import { UserDocument } from '../../domain/user.schema';
+import { UserDocument } from '../../domain/user.entity';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 
 export class UserViewModel {

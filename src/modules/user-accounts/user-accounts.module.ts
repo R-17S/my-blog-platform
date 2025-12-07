@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './domain/user.schema';
+import { User, UserEntity } from './domain/user.entity';
 import { UsersController } from './api/users.controller';
 import { UsersRepository } from './infrastructure/users.repository';
 import { UsersQueryRepository } from './infrastructure/query/users.query-repository';
@@ -9,7 +9,7 @@ import { ArgonService } from '../../core/security/argon2.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserEntity }]),
   ],
   controllers: [UsersController],
   providers: [

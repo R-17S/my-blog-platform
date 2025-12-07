@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
+import { NotFoundException } from '@nestjs/common';
 
 @Schema({ timestamps: true })
 export class Blog {
@@ -42,7 +43,7 @@ export class Blog {
 
   makeDeleted() {
     if (this.deletedAt !== null) {
-      throw new Error('Blog already deleted');
+      throw new NotFoundException('Blog already deleted');
     }
     this.deletedAt = new Date();
   }

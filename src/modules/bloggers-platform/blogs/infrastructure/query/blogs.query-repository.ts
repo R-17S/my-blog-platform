@@ -40,7 +40,10 @@ export class BlogsQueryRepository {
   }
 
   async getBlogByIdOrError(id: string): Promise<BlogViewModel> {
-    const result = await this.blogModel.findById(id).lean();
+    const result = await this.blogModel
+      .findOne({ _id: id, deletedAt: null }) // фильтруем только "живые" блоги
+      .lean();
+
     if (!result) throw new NotFoundException('Blog not found');
     return BlogViewModel.mapToView(result);
   }

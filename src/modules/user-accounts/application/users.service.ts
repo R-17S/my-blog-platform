@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../domain/user.schema';
-import type { UserModelType } from '../domain/user.schema';
+import { User } from '../domain/user.entity';
+import type { UserModelType } from '../domain/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { ArgonService } from '../../../core/security/argon2.service';
 import { UsersRepository } from '../infrastructure/users.repository';

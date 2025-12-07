@@ -47,7 +47,9 @@ export class PostsQueryRepository {
     id: string,
     userId?: string,
   ): Promise<PostViewModel> {
-    const result = await this.postModel.findById(id).lean();
+    const result = await this.postModel
+      .findOne({ _id: id, deletedAt: null }) // фильтруем только "живые" блоги
+      .lean();
     if (!result) throw new NotFoundException('Post not found');
 
     const items = await this.postLikesRepository.enrichPostsWithLikes(

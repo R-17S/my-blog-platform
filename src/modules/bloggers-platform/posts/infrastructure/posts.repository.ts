@@ -14,7 +14,11 @@ export class PostsRepository {
   }
 
   async findById(id: string): Promise<PostDocument | null> {
-    return this.postModel.findById(id);
+    if (!Types.ObjectId.isValid(id)) return null;
+    return this.postModel.findOne({
+      _id: new Types.ObjectId(id),
+      deletedAt: null,
+    });
   }
 
   async exists(id: string): Promise<boolean> {
