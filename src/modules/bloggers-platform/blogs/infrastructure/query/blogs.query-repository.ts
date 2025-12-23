@@ -15,9 +15,11 @@ export class BlogsQueryRepository {
   ) {}
 
   async getAllBlogs(params: BlogInputQuery): Promise<BlogsViewPaginated> {
-    const filter = params.searchNameTerm
-      ? { name: { $regex: params.searchNameTerm, $options: 'i' } }
-      : {};
+    const filter: Record<string, unknown> = { deletedAt: null };
+
+    if (params.searchNameTerm) {
+      filter.name = { $regex: params.searchNameTerm, $options: 'i' };
+    }
 
     const [totalCount, blogs] = await Promise.all([
       this.blogModel.countDocuments(filter),

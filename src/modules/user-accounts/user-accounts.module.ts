@@ -5,7 +5,7 @@ import { UsersController } from './api/users.controller';
 import { UsersRepository } from './infrastructure/users.repository';
 import { UsersQueryRepository } from './infrastructure/query/users.query-repository';
 import { UsersService } from './application/users.service';
-import { ArgonService } from '../../core/security/argon2.service';
+import { ArgonService } from './application/argon2.service';
 
 @Module({
   imports: [
@@ -18,6 +18,6 @@ import { ArgonService } from '../../core/security/argon2.service';
     UsersService,
     ArgonService,
   ],
-  exports: [UsersRepository, UsersService],
+  exports: [UsersRepository, UsersService, ArgonService],
 })
 export class UserAccountsModule {}

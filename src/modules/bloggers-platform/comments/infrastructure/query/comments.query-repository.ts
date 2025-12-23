@@ -68,7 +68,7 @@ export class CommentsQueryRepository {
     params: CommentInputQuery,
     userId?: string,
   ): Promise<CommentsViewPaginated> {
-    const filter = { postId: id };
+    const filter = { postId: id, deletedAt: null };
 
     const [totalCount, comments] = await Promise.all([
       this.commentModel.countDocuments(filter),

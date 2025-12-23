@@ -1,14 +1,12 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../domain/user.entity';
 import type { UserModelType } from '../domain/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { ArgonService } from '../../../core/security/argon2.service';
+import { ArgonService } from './argon2.service';
 import { UsersRepository } from '../infrastructure/users.repository';
+import { DomainException } from '../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class UsersService {
@@ -24,8 +22,18 @@ export class UsersService {
       this.usersRepository.findByEmail(input.email),
     ]);
 
-    if (loginExists) throw new BadRequestException('Login should be unique');
-    if (emailExists) throw new BadRequestException('Email should be unique');
+    if (loginExists)
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Login should be unique',
+        extensions: [{ key: 'Login', message: 'Login should be unique' }],
+      });
+    if (emailExists)
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Email should be unique',
+        extensions: [{ key: 'Email', message: 'Email should be unique' }],
+      });
 
     const passwordHash = await this.argonService.generateHash(input.password);
 
@@ -41,7 +49,11 @@ export class UsersService {
 
   async deleteUser(id: string): Promise<void> {
     const user = await this.usersRepository.findById(id);
-    if (!user) throw new NotFoundException('User not found');
+    if (!user)
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'User not found',
+      });
 
     user.makeDeleted();
     await this.usersRepository.save(user);

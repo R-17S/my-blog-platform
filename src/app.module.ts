@@ -8,6 +8,9 @@ import { UserAccountsModule } from './modules/user-accounts/user-accounts.module
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { AuthModule } from './modules/user-accounts/auth.module';
+import { EmailModule } from './modules/user-accounts/email.module';
 
 @Module({
   imports: [
@@ -20,8 +23,11 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'swagger-static'),
       serveRoot: process.env.NODE_ENV === 'development' ? '/' : '/swagger',
     }),
+    ThrottlerModule.forRoot([{ ttl: 10, limit: 5 }]), // окно в секундах // максимум запросов
     BloggersPlatformModule,
     UserAccountsModule,
+    AuthModule,
+    EmailModule,
     TestingModule,
   ],
   controllers: [AppController],

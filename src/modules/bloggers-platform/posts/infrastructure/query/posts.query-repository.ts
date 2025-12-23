@@ -20,10 +20,11 @@ export class PostsQueryRepository {
     params: PostInputQuery,
     userId?: string,
   ): Promise<PostsViewPaginated> {
+    const filter = { deletedAt: null };
     const [totalCount, posts] = await Promise.all([
-      this.postModel.countDocuments({}),
+      this.postModel.countDocuments(filter),
       this.postModel
-        .find({})
+        .find(filter)
         .sort(params.SortOptions(params.sortBy))
         .skip(params.calculateSkip())
         .limit(params.pageSize)
@@ -64,7 +65,7 @@ export class PostsQueryRepository {
     params: PostInputQuery,
     userId?: string,
   ): Promise<PostsViewPaginated> {
-    const filter = { blogId: id };
+    const filter = { blogId: id, deletedAt: null };
 
     const [totalCount, posts] = await Promise.all([
       this.postModel.countDocuments(filter),

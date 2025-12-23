@@ -9,8 +9,8 @@ export class UsersRepository {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async save(post: UserDocument): Promise<void> {
-    await post.save();
+  async save(user: UserDocument): Promise<void> {
+    await user.save();
   }
 
   async findById(id: string): Promise<UserDocument | null> {
@@ -35,5 +35,15 @@ export class UsersRepository {
 
   async deleteAll(): Promise<void> {
     await this.userModel.deleteMany({});
+  }
+
+  async findByConfirmationCode(code: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({
+      'emailConfirmation.confirmationCode': code,
+    });
+  }
+
+  async findByRecoveryCode(code: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ 'passwordRecovery.recoveryCode': code });
   }
 }
