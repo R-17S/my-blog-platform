@@ -1,7 +1,7 @@
 import { ArgonService } from './argon2.service';
 import { UserContextDto } from '../guards/dto/user-context.dto';
 import { UsersRepository } from '../infrastructure/users.repository';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserInputDto } from '../api/input-dto/users.input-dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,6 +9,8 @@ import { User, type UserModelType } from '../domain/user.entity';
 import { randomUUID } from 'node:crypto';
 import { add } from 'date-fns';
 import { EmailService } from './email.service';
+import { DomainException } from '../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class AuthService {
@@ -24,10 +26,15 @@ export class AuthService {
   // 1. LOGIN
   // -----------------------------
   async validateUser(
-    login: string,
+    username: string,
     password: string,
   ): Promise<UserContextDto | null> {
-    const user = await this.usersRepository.findByLogin(login);
+    const isEmail = username.includes('@');
+
+    const user = isEmail
+      ? await this.usersRepository.findByEmail(username)
+      : await this.usersRepository.findByLogin(username);
+
     if (!user) {
       return null;
     }
@@ -61,8 +68,18 @@ export class AuthService {
       this.usersRepository.findByEmail(input.email),
     ]);
 
-    if (loginExists) throw new BadRequestException('Login should be unique');
-    if (emailExists) throw new BadRequestException('Email should be unique');
+    if (loginExists)
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Login should be unique',
+        extensions: [{ key: 'Login', message: 'Login should be unique' }],
+      });
+    if (emailExists)
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Email should be unique',
+        extensions: [{ key: 'Email', message: 'Email should be unique' }],
+      });
 
     const passwordHash = await this.argonService.generateHash(input.password);
     const confirmationCode = randomUUID();
@@ -86,15 +103,27 @@ export class AuthService {
     const user = await this.usersRepository.findByConfirmationCode(code);
 
     if (!user) {
-      throw new BadRequestException('Invalid confirmation code');
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Invalid confirmation code',
+        extensions: [{ key: 'Сode', message: 'Invalid confirmation code' }],
+      });
     }
 
     if (user.emailConfirmation.isConfirmed) {
-      throw new BadRequestException('Email already confirmed');
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Email already confirmed',
+        extensions: [{ key: 'Email', message: 'Email already confirmed' }],
+      });
     }
 
     if (user.emailConfirmation.expirationDate < new Date()) {
-      throw new BadRequestException('Confirmation code expired');
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Confirmation code expired',
+        extensions: [{ key: 'Сode', message: 'Confirmation code expired' }],
+      });
     }
 
     user.emailConfirmation.isConfirmed = true;
@@ -146,11 +175,19 @@ export class AuthService {
     const user = await this.usersRepository.findByRecoveryCode(recoveryCode);
 
     if (!user) {
-      throw new BadRequestException('Invalid or expired recovery code');
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Invalid confirmation code',
+        extensions: [{ key: 'Сode', message: 'Invalid confirmation code' }],
+      });
     }
 
     if (user.passwordRecovery!.expirationDate < new Date()) {
-      throw new BadRequestException('Recovery code expired');
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Confirmation code expired',
+        extensions: [{ key: 'Сode', message: 'Confirmation code expired' }],
+      });
     }
 
     const newHash = await this.argonService.generateHash(newPassword);

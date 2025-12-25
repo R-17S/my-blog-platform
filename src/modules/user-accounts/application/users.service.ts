@@ -48,15 +48,14 @@ export class UsersService {
   }
 
   async deleteUser(id: string): Promise<void> {
-    const user = await this.usersRepository.findById(id);
+    const user = await this.usersRepository.exists(id);
     if (!user)
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: 'User not found',
       });
 
-    user.makeDeleted();
-    await this.usersRepository.save(user);
+    await this.usersRepository.delete(id);
   }
 
   // async checkBlogExistsOrError(id: string): Promise<void> {

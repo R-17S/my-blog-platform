@@ -22,15 +22,19 @@ export class UsersRepository {
   }
 
   async findByLogin(login: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ login });
+    return this.userModel.findOne({ login, deletedAt: null });
   }
 
   async findByEmail(email: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ email });
+    return this.userModel.findOne({ email, deletedAt: null });
   }
 
   async exists(id: string): Promise<boolean> {
     return !!(await this.userModel.exists({ _id: new Types.ObjectId(id) }));
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.userModel.deleteOne({ _id: id });
   }
 
   async deleteAll(): Promise<void> {

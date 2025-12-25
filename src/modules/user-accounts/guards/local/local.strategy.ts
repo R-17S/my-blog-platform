@@ -10,7 +10,7 @@ import type { IStrategyOptions } from 'passport-local';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
-    const options: IStrategyOptions = { usernameField: 'login' };
+    const options: IStrategyOptions = { usernameField: 'loginOrEmail' };
     super(options);
   }
 

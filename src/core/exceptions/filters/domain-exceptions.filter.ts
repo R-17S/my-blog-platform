@@ -23,8 +23,7 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
     //const responseBody = this.buildResponseBody(exception, request.url); // это человеческая версия ошибки
     if (
       exception.code === DomainExceptionCode.Unauthorized ||
-      exception.code === DomainExceptionCode.NotFound ||
-      exception.code === DomainExceptionCode.BadRequest
+      exception.code === DomainExceptionCode.NotFound
     ) {
       response.status(status).end();
       return;

@@ -6,12 +6,13 @@ import { EmailService } from './application/email.service';
   imports: [
     MailerModule.forRoot({
       transport: {
-        host: process.env.SMTP_HOST,
-        port: 587,
+        service: 'gmail',
         auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
+          user: 'gmtest809@gmail.com',
+          pass: 'ahizswcsgwcyzrhd',
         },
+        //logger: true, // ← логирование SMTP
+        //debug: true, // ← подробные SMTP-логи
       },
       defaults: {
         from: '"My App" <no-reply@myapp.com>',
