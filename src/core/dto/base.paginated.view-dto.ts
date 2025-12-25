@@ -1,6 +1,6 @@
 //базовый класс view модели для запросов за списком с пагинацией
-export abstract class PaginatedViewDto<T> {
-  abstract items: T;
+export class PaginatedViewDto<T> {
+  items: T;
   totalCount: number;
   pagesCount: number;
   page: number;

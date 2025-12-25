@@ -22,5 +22,5 @@ export class BlogViewModel {
 }
 
 export class BlogsViewPaginated extends PaginatedViewDto<BlogViewModel[]> {
-  items: BlogViewModel[];
+  //items: BlogViewModel[];
 }

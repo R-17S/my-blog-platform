@@ -44,5 +44,5 @@ export class CommentViewModel {
 export class CommentsViewPaginated extends PaginatedViewDto<
   CommentViewModel[]
 > {
-  items: CommentViewModel[];
+  //items: CommentViewModel[];
 }

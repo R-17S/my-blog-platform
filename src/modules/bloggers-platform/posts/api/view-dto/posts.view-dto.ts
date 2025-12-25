@@ -50,5 +50,5 @@ export class PostViewModel {
 }
 
 export class PostsViewPaginated extends PaginatedViewDto<PostViewModel[]> {
-  items: PostViewModel[];
+  //items: PostViewModel[];
 }

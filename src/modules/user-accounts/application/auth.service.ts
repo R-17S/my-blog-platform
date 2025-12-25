@@ -135,12 +135,18 @@ export class AuthService {
   async resendRegistrationEmail(email: string): Promise<void> {
     const user = await this.usersRepository.findByEmail(email);
 
-    if (!user) return;
+    if (!user) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Invalid confirmation code',
+        extensions: [{ key: 'email', message: 'Invalid confirmation code' }],
+      });
+    }
     if (user.emailConfirmation.isConfirmed) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
-        message: 'Email already confirmed',
-        extensions: [{ key: 'email', message: 'Email already confirmed' }],
+        message: 'User email doesnt exist',
+        extensions: [{ key: 'email', message: 'User email doesnt exist' }],
       });
     }
 

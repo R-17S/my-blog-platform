@@ -18,9 +18,7 @@ export class UserViewModel {
   }
 }
 
-export class UsersViewPaginated extends PaginatedViewDto<UserViewModel[]> {
-  items: UserViewModel[];
-}
+export class UsersViewPaginated extends PaginatedViewDto<UserViewModel[]> {}
 
 export class MeViewDto extends OmitType(UserViewModel, [
   'createdAt',
