@@ -99,7 +99,7 @@ export class CommentsQueryRepository {
     return CommentsViewPaginated.mapToView({
       items,
       page: params.pageNumber,
-      size: params.pageSize,
+      pageSize: params.pageSize,
       totalCount,
     });
   }

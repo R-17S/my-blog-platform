@@ -72,13 +72,13 @@ export class AuthService {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: 'Login should be unique',
-        extensions: [{ key: 'Login', message: 'Login should be unique' }],
+        extensions: [{ key: 'login', message: 'Login should be unique' }],
       });
     if (emailExists)
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: 'Email should be unique',
-        extensions: [{ key: 'Email', message: 'Email should be unique' }],
+        extensions: [{ key: 'email', message: 'Email should be unique' }],
       });
 
     const passwordHash = await this.argonService.generateHash(input.password);
@@ -106,7 +106,7 @@ export class AuthService {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: 'Invalid confirmation code',
-        extensions: [{ key: 'Сode', message: 'Invalid confirmation code' }],
+        extensions: [{ key: 'code', message: 'Invalid confirmation code' }],
       });
     }
 
@@ -114,7 +114,7 @@ export class AuthService {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: 'Email already confirmed',
-        extensions: [{ key: 'Email', message: 'Email already confirmed' }],
+        extensions: [{ key: 'email', message: 'Email already confirmed' }],
       });
     }
 
@@ -122,7 +122,7 @@ export class AuthService {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: 'Confirmation code expired',
-        extensions: [{ key: 'Сode', message: 'Confirmation code expired' }],
+        extensions: [{ key: 'code', message: 'Confirmation code expired' }],
       });
     }
 
@@ -136,7 +136,13 @@ export class AuthService {
     const user = await this.usersRepository.findByEmail(email);
 
     if (!user) return;
-    if (user.emailConfirmation.isConfirmed) return;
+    if (user.emailConfirmation.isConfirmed) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Email already confirmed',
+        extensions: [{ key: 'email', message: 'Email already confirmed' }],
+      });
+    }
 
     const newCode = randomUUID();
     const newExpirationDate = add(new Date(), { hours: 24 });
@@ -178,7 +184,7 @@ export class AuthService {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: 'Invalid confirmation code',
-        extensions: [{ key: 'Сode', message: 'Invalid confirmation code' }],
+        extensions: [{ key: 'code', message: 'Invalid confirmation code' }],
       });
     }
 
@@ -186,7 +192,7 @@ export class AuthService {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: 'Confirmation code expired',
-        extensions: [{ key: 'Сode', message: 'Confirmation code expired' }],
+        extensions: [{ key: 'code', message: 'Confirmation code expired' }],
       });
     }
 

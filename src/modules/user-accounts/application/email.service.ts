@@ -11,8 +11,10 @@ export class EmailService {
     await this.mailer.sendMail({
       to: email,
       subject: 'Confirm your registration',
-      template: './registration', // registration.hbs
-      context: { confirmationCode },
+      html: `
+          <p>Здравствуйте!</p>
+          <p>Ваш код подтверждения регистрации: <strong>${confirmationCode}</strong></p>
+          <p>Если вы не регистрировались — просто проигнорируйте это письмо.</p> `,
     });
   }
 
@@ -20,15 +22,17 @@ export class EmailService {
     await this.mailer.sendMail({
       to: email,
       subject: 'Password recovery',
-      template: './recovery', // recovery.hbs
-      context: { recoveryCode },
+      html: `
+          <p>Здравствуйте!</p>
+          <p>Ваш код восстановления пароля: <strong>${recoveryCode}</strong></p>
+          <p>Если вы не запрашивали восстановление — просто проигнорируйте это письмо.</p> `,
     });
   }
   async sendPasswordUpdatedEmail(email: string): Promise<void> {
     await this.mailer.sendMail({
       to: email,
       subject: 'Your password has been updated',
-      template: './password-updated', // password-updated.hbs
+      template: 'password-updated', // password-updated.hbs
       context: {},
     });
   }

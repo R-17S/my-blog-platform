@@ -36,7 +36,7 @@ export class BlogsQueryRepository {
       // каждый документ мапится BlogViewModel, а как сделать другую сложность
       //blogs.map(BlogViewModel.mapToView) почему не работает вот так ?
       page: params.pageNumber,
-      size: params.pageSize,
+      pageSize: params.pageSize,
       totalCount,
     });
   }

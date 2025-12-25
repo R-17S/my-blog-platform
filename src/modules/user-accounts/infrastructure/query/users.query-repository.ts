@@ -41,7 +41,7 @@ export class UsersQueryRepository {
     return UsersViewPaginated.mapToView({
       items: users.map((user) => UserViewModel.mapToView(user)),
       page: params.pageNumber,
-      size: params.pageSize,
+      pageSize: params.pageSize,
       totalCount,
     });
   }

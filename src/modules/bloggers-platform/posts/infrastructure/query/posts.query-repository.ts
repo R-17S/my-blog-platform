@@ -39,7 +39,7 @@ export class PostsQueryRepository {
     return PostsViewPaginated.mapToView({
       items,
       page: params.pageNumber,
-      size: params.pageSize,
+      pageSize: params.pageSize,
       totalCount,
     });
   }
@@ -85,7 +85,7 @@ export class PostsQueryRepository {
     return PostsViewPaginated.mapToView({
       items,
       page: params.pageNumber,
-      size: params.pageSize,
+      pageSize: params.pageSize,
       totalCount,
     });
   }
