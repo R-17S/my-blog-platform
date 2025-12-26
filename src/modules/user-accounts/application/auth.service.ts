@@ -142,11 +142,12 @@ export class AuthService {
         extensions: [{ key: 'email', message: 'Invalid confirmation code' }],
       });
     }
+
     if (user.emailConfirmation.isConfirmed) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
-        message: 'User email doesnt exist',
-        extensions: [{ key: 'email', message: 'User email doesnt exist' }],
+        message: 'Email already confirmed',
+        extensions: [{ key: 'email', message: 'Email already confirmed' }],
       });
     }
 
