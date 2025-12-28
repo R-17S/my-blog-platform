@@ -16,7 +16,7 @@ dotenv.config();
         service: 'gmail',
         auth: {
           user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASSWORD,
+          pass: process.env.SMTP_PASS2,
         },
         //logger: true, // ← логирование SMTP
         //debug: true, // ← подробные SMTP-логи
