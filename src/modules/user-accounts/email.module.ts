@@ -3,15 +3,20 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from './application/email.service';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import path from 'node:path';
+import dotenv from 'dotenv';
 
+dotenv.config();
+
+// const x = process.env.SMTP_USER;
+// console.log('env', x);
 @Module({
   imports: [
     MailerModule.forRoot({
       transport: {
         service: 'gmail',
         auth: {
-          user: 'gmtest809@gmail.com',
-          pass: 'ahizswcsgwcyzrhd',
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASSWORD,
         },
         //logger: true, // ← логирование SMTP
         //debug: true, // ← подробные SMTP-логи

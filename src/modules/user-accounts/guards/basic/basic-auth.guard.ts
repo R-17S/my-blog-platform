@@ -13,8 +13,7 @@ export class BasicAuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
-    const authHeader = request.headers['authorization'] as string | undefined; //request.headers.authorization; какого хрена не работает
-
+    const authHeader = request.headers['authorization'] as string | undefined; //request.headers.authorization; Не работает потому что нужен import req из express
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),

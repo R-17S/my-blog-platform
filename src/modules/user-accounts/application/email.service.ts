@@ -13,7 +13,10 @@ export class EmailService {
       subject: 'Confirm your registration',
       html: `
           <p>Здравствуйте!</p>
-          <p>Ваш код подтверждения регистрации: <strong>${confirmationCode}</strong></p>
+          <p>Ваш код подтверждения регистрации</p>
+          <a href="https://your-front.com/confirm-registration?code=${confirmationCode}">
+      Подтвердить email
+    </a>
           <p>Если вы не регистрировались — просто проигнорируйте это письмо.</p> `,
     });
   }
@@ -24,7 +27,10 @@ export class EmailService {
       subject: 'Password recovery',
       html: `
           <p>Здравствуйте!</p>
-          <p>Ваш код восстановления пароля: <strong>${recoveryCode}</strong></p>
+          <p>Ваш код восстановления пароля</p>
+          <a href="https://your-front.com/confirm-registration?code=${recoveryCode}">
+      Подтвердить email
+    </a>
           <p>Если вы не запрашивали восстановление — просто проигнорируйте это письмо.</p> `,
     });
   }
