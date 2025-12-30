@@ -1,12 +1,15 @@
 import { Type } from 'class-transformer';
+import { IsNumber } from 'class-validator';
 
 //базовый класс для query параметров с пагинацией
 //значения по-умолчанию применятся автоматически при настройке глобального ValidationPipe в main.ts
 export class BaseQueryParams {
   //для трансформации в number
   @Type(() => Number)
+  @IsNumber()
   pageNumber: number = 1;
   @Type(() => Number)
+  @IsNumber()
   pageSize: number = 10;
   sortDirection: SortDirection = SortDirection.Desc;
 
