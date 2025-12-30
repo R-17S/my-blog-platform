@@ -37,7 +37,7 @@ export class UsersQueryRepository {
         .limit(params.pageSize)
         .lean(),
     ]);
-
+    // console.log(params);
     return UsersViewPaginated.mapToView({
       items: users.map((user) => UserViewModel.mapToView(user)),
       page: params.pageNumber,

@@ -8,6 +8,8 @@ import {
   Extension,
 } from '../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../core/exceptions/domain-exception-codes';
+import { useContainer } from 'class-validator';
+import { AppModule } from '../app.module';
 
 export const errorFormatter = (
   errors: ValidationError[],
@@ -36,6 +38,7 @@ export const errorFormatter = (
 };
 
 export function pipesSetup(app: INestApplication) {
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
   //Глобальный пайп для валидации и трансформации входящих данных.
   //На следующем занятии рассмотрим подробнее
   app.useGlobalPipes(
