@@ -29,7 +29,7 @@ export class UsersQueryRepository {
     }
 
     const [totalCount, users] = await Promise.all([
-      this.userModel.countDocuments(filter),
+      this.userModel.countDocuments(),
       this.userModel
         .find(filter)
         .sort(params.SortOptions(params.sortBy))

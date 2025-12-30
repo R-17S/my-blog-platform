@@ -1,8 +1,13 @@
 import { Type } from 'class-transformer';
-import { IsNumber } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional } from 'class-validator';
 
 //базовый класс для query параметров с пагинацией
 //значения по-умолчанию применятся автоматически при настройке глобального ValidationPipe в main.ts
+export enum SortDirection {
+  Asc = 'asc',
+  Desc = 'desc',
+}
+
 export class BaseQueryParams {
   //для трансформации в number
   @Type(() => Number)
@@ -11,6 +16,9 @@ export class BaseQueryParams {
   @Type(() => Number)
   @IsNumber()
   pageSize: number = 10;
+  @IsOptional()
+  @IsEnum(SortDirection)
+  @Type(() => String)
   sortDirection: SortDirection = SortDirection.Desc;
 
   calculateSkip() {
@@ -22,9 +30,4 @@ export class BaseQueryParams {
       [sortBy]: this.sortDirection === SortDirection.Asc ? 1 : -1,
     };
   }
-}
-
-export enum SortDirection {
-  Asc = 'asc',
-  Desc = 'desc',
 }
