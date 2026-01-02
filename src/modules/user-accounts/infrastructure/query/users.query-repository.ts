@@ -15,7 +15,8 @@ export class UsersQueryRepository {
   ) {}
 
   async getAllUsers(params: UserInputQuery): Promise<UsersViewPaginated> {
-    const filter: Record<string, unknown> = { deletedAt: null }; //а что тут делать, есть какой то FilterQuery<UserDocument> но он не хочет работать и почему ?
+    const filter: any = {}; //а что тут делать, есть какой то FilterQuery<UserDocument> но он не хочет работать и почему ?
+    //const filter: FilterQuery<UserDocument> = {};
 
     if (params.searchLoginTerm && params.searchEmailTerm) {
       filter.$or = [
@@ -29,7 +30,7 @@ export class UsersQueryRepository {
     }
 
     const [totalCount, users] = await Promise.all([
-      this.userModel.countDocuments(),
+      this.userModel.countDocuments(filter),
       this.userModel
         .find(filter)
         .sort(params.SortOptions(params.sortBy))
