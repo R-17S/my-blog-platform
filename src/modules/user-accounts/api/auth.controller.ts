@@ -34,6 +34,7 @@ export class AuthController {
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
   registration(@Body() body: CreateUserInputDto): Promise<void> {
+    console.log('🔥 [Controller] registration called with:', body);
     return this.authService.registerUser(body);
   }
 
@@ -54,6 +55,7 @@ export class AuthController {
     /*@Request() req: any*/
     @ExtractUserFromRequest() user: UserContextDto,
   ): { accessToken: string } {
+    //console.log('🔥 [Controller] login called with:', user.id);
     return this.authService.login(user.id);
   }
 

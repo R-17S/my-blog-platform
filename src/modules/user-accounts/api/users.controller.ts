@@ -17,7 +17,6 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UsersService } from '../application/users.service';
 import { BasicAuthGuard } from '../guards/basic/basic-auth.guard';
 
-
 @UseGuards(BasicAuthGuard) // можно ставить над классом и все методы контроллера будут требовать BasicAuth.
 @Controller('users')
 export class UsersController {

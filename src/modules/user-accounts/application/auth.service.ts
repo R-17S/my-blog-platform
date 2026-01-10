@@ -29,13 +29,23 @@ export class AuthService {
     username: string,
     password: string,
   ): Promise<UserContextDto | null> {
+    console.log(
+      '🔥 [AuthService] вызвали валидацию и смотрим что пришло в validateUser',
+      username,
+    );
+    console.log(
+      '🔥 [AuthService] смотрим что пришлов validateUser  passwordHash:',
+      password,
+    );
     const isEmail = username.includes('@');
 
     const user = isEmail
       ? await this.usersRepository.findByEmail(username)
       : await this.usersRepository.findByLogin(username);
+    console.log('🔥 [AuthService] нашли', user);
 
     if (!user) {
+      console.log('❌ [AuthService] не нашли');
       return null;
     }
 
@@ -43,7 +53,7 @@ export class AuthService {
       password,
       user.passwordHash,
     );
-
+    console.log('🔥 [AuthService] argon result:', isPasswordValid);
     if (!isPasswordValid) {
       return null;
     }
@@ -52,6 +62,7 @@ export class AuthService {
   }
 
   login(userId: string) {
+    console.log('🔥 [AuthService] login called:', userId);
     const accessToken = this.jwtService.sign({ id: userId } as UserContextDto);
 
     return {
@@ -63,6 +74,7 @@ export class AuthService {
   // 2. REGISTRATION
   // -----------------------------
   async registerUser(input: CreateUserInputDto): Promise<void> {
+    console.log('🔥 [AuthService] register called with:', input);
     const [loginExists, emailExists] = await Promise.all([
       this.usersRepository.findByLogin(input.login),
       this.usersRepository.findByEmail(input.email),
@@ -90,6 +102,7 @@ export class AuthService {
       passwordHash,
       confirmationCode,
     );
+    console.log('🔥 [AuthService] user created:', newUser);
 
     await this.usersRepository.save(newUser);
 
@@ -97,6 +110,7 @@ export class AuthService {
       input.email,
       confirmationCode,
     );
+    console.log('🔥 [AuthService] email sending triggered');
   }
 
   async confirmRegistration(code: string): Promise<void> {

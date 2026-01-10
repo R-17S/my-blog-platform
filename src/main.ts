@@ -1,21 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { appSetup } from './setup/app.setup';
-import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
-import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
+import dotenv from 'dotenv';
 // core
 import { createWriteStream } from 'fs';
 import { get } from 'http';
 
+const result = dotenv.config();
+console.log('Loaded from .env:', result.parsed);
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
-  app.useGlobalFilters(
-    new AllHttpExceptionsFilter(), // потом всё остальное
-    new DomainHttpExceptionsFilter(), // сначала ловим кастомные
-  );
   appSetup(app);
   await app.listen(process.env.PORT ?? 3000);
+
   const serverUrl = 'http://localhost:3003';
   // get the swagger json file (if app is running in development mode)
   if (process.env.NODE_ENV === 'development') {

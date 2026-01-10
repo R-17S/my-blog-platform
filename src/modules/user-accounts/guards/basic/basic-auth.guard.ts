@@ -6,8 +6,8 @@ import { DomainExceptionCode } from '../../../../core/exceptions/domain-exceptio
 
 @Injectable()
 export class BasicAuthGuard implements CanActivate {
-  private readonly validUsername = 'admin';
-  private readonly validPassword = 'qwerty';
+  private readonly validUsername = process.env.ADMIN_USERNAME;
+  private readonly validPassword = process.env.ADMIN_PASSWORD;
 
   constructor(private reflector: Reflector) {}
 

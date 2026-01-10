@@ -3,9 +3,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from './application/email.service';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import path from 'node:path';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 @Module({
   imports: [

@@ -16,7 +16,7 @@ import { EmailModule } from './modules/user-accounts/email.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(
-      process.env.MONGO_URL ??
+      process.env.MONGO_URL_LOCAL ??
         'mongodb://localhost:27017/nest-blogger-platform',
     ),
     ServeStaticModule.forRoot({
@@ -34,4 +34,4 @@ import { EmailModule } from './modules/user-accounts/email.module';
   providers: [AppService],
 })
 export class AppModule {}
-console.log('✅ Оно работает, можно пока прочитать молитву духу машины');
+// console.log('✅ Оно работает, можно пока прочитать молитву духу машины');
