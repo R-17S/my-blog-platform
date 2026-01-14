@@ -39,7 +39,7 @@ export class PostsService {
     const post = await this.postsRepository.findById(id);
     if (!post) throw new NotFoundException('Post not found');
 
-    await this.blogsService.checkBlogExistsOrError(input.blogId);
+    await this.blogsRepository.checkBlogExistsOrError(input.blogId);
 
     post.updateDetails(input.title, input.shortDescription, input.content);
     await this.postsRepository.save(post);
@@ -54,8 +54,8 @@ export class PostsService {
     await this.postsRepository.save(post);
   }
 
-  async checkPostExistsOrError(id: string): Promise<void> {
-    const exists = await this.postsRepository.exists(id);
-    if (!exists) throw new NotFoundException('Post not found');
-  }
+  // async checkPostExistsOrError(id: string): Promise<void> {
+  //   const exists = await this.postsRepository.exists(id);
+  //   if (!exists) throw new NotFoundException('Post not found');
+  // }
 }

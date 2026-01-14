@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserInputDto } from '../api/input-dto/users.input-dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, type UserModelType } from '../domain/user.entity';
+import { User, UserDocument, type UserModelType } from '../domain/user.entity';
 import { randomUUID } from 'node:crypto';
 import { add } from 'date-fns';
 import { EmailService } from './email.service';
@@ -58,16 +58,21 @@ export class AuthService {
       return null;
     }
 
-    return { id: user._id.toString() };
+    return user; //{ id: user._id.toString() };
   }
 
-  login(userId: string) {
-    console.log('🔥 [AuthService] login called:', userId);
-    const accessToken = this.jwtService.sign({ id: userId } as UserContextDto);
-
-    return {
-      accessToken,
-    };
+  login(user: UserDocument) {
+    const accessPayload = { id: user._id.toString(), login: user.login };
+    const accessToken = this.jwtService.sign(accessPayload, {
+      secret: 'access-token-secret',
+      expiresIn: '10m',
+    });
+    const refreshPayload = { id: user._id.toString(), deviceId: randomUUID() };
+    const refreshToken = this.jwtService.sign(refreshPayload, {
+      secret: 'refresh-token-secret',
+      expiresIn: '7d',
+    });
+    return { accessToken, refreshToken };
   }
 
   // -----------------------------

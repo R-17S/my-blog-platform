@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
+import { PostEntity } from '../../posts/domain/post.entity';
 
 @Schema({ timestamps: true })
 export class Blog {
@@ -47,10 +48,10 @@ export class Blog {
   }
 }
 
-export const BlogSchema = SchemaFactory.createForClass(Blog);
+export const BlogEntity = SchemaFactory.createForClass(Blog);
 
 //регистрирует методы сущности в схеме
-BlogSchema.loadClass(Blog);
+BlogEntity.loadClass(Blog);
 
 //Типизация документа
 export type BlogDocument = HydratedDocument<Blog>;

@@ -1,14 +1,17 @@
-import { PostLike, PostLikeDocument } from '../domain/post.like-scheme';
+import { PostLike, PostLikeDocument } from '../../domain/post.like-scheme';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { NewestLikeViewModel } from '../dto/newest-like-view-model';
-import { AggregatedLikesResult } from './interface/post-aggregated-likes-result';
-import { PostDocument } from '../domain/post.entity';
-import { LikeStatusTypes, PostViewModel } from '../api/view-dto/posts.view-dto';
+import { NewestLikeViewModel } from '../../dto/newest-like-view-model';
+import { AggregatedLikesResult } from '../interface/post-aggregated-likes-result';
+import { PostDocument } from '../../domain/post.entity';
+import {
+  LikeStatusTypes,
+  PostViewModel,
+} from '../../api/view-dto/posts.view-dto';
 
 @Injectable()
-export class PostLikesRepository {
+export class PostLikesQueryRepository {
   constructor(
     @InjectModel(PostLike.name)
     private readonly likeModel: Model<PostLikeDocument>,

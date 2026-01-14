@@ -40,9 +40,9 @@ export class Comment {
    */
   static createInstance(
     content: string,
+    postId: string,
     userId: string,
     userLogin: string,
-    postId: string,
   ): CommentDocument {
     const comment = new this();
     comment.content = content;

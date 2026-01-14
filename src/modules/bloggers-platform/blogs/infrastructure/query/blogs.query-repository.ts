@@ -1,4 +1,3 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   BlogsViewPaginated,
   BlogViewModel,
@@ -7,6 +6,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../../domain/blog.entity';
 import { Model } from 'mongoose';
 import { BlogInputQuery } from '../../api/input-dto/get-blogs-query-params.input-dto';
+import { DomainException } from '../../../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -46,7 +48,11 @@ export class BlogsQueryRepository {
       .findOne({ _id: id, deletedAt: null }) // фильтруем только "живые" блоги
       .lean();
 
-    if (!result) throw new NotFoundException('Blog not found');
+    if (!result)
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Blog not found',
+      });
     return BlogViewModel.mapToView(result);
   }
 }

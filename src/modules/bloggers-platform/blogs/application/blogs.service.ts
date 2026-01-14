@@ -40,8 +40,8 @@ export class BlogsService {
     await this.blogsRepository.save(blog);
   }
 
-  async checkBlogExistsOrError(id: string): Promise<void> {
-    const exists = await this.blogsRepository.exists(id);
-    if (!exists) throw new NotFoundException('Blog not found');
-  }
+  // async checkBlogExistsOrError(id: string): Promise<void> {
+  //   const exists = await this.blogsRepository.exists(id);
+  //   if (!exists) throw new NotFoundException('Blog not found');
+  // }
 }

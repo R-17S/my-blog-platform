@@ -1,14 +1,14 @@
 import {
   CommentLike,
   CommentLikeDocument,
-} from '../domain/comment.like-scheme';
+} from '../../domain/comment.like-scheme';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { LikeStatusTypes } from '../api/view-dto/comments.view-dto';
+import { LikeStatusTypes } from '../../api/view-dto/comments.view-dto';
 
 @Injectable()
-export class CommentLikesRepository {
+export class CommentLikesQueryRepository {
   constructor(
     @InjectModel(CommentLike.name)
     private readonly likeModel: Model<CommentLikeDocument>,

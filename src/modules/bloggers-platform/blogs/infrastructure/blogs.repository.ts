@@ -1,7 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Blog, BlogDocument } from '../domain/blog.entity';
+import { DomainException } from '../../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class BlogsRepository {
@@ -25,12 +27,30 @@ export class BlogsRepository {
     const blog = await this.blogModel
       .findById(id, { name: 1 })
       .lean<{ name: string }>();
-    if (!blog) throw new NotFoundException('Blog not found');
+    if (!blog)
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Blog not found',
+      });
     return blog.name;
   }
 
-  async exists(id: string): Promise<boolean> {
-    return !!(await this.blogModel.exists({ _id: new Types.ObjectId(id) }));
+  async checkBlogExistsOrError(id: string): Promise<void> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Blog not found',
+      });
+    }
+    const exists = await this.blogModel.exists({
+      _id: new Types.ObjectId(id),
+      deletedAt: null,
+    });
+    if (!exists)
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Blog not found',
+      });
   }
 
   async deleteAll(): Promise<void> {

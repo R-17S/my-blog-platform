@@ -7,7 +7,7 @@ import {
   LikeStatusTypes,
 } from '../../api/view-dto/comments.view-dto';
 import { Comment, CommentDocument } from '../../domain/comment.entity';
-import { CommentLikesRepository } from '../comments.likes-repository';
+import { CommentLikesQueryRepository } from './comments.likes.query-repository';
 import { CommentInputQuery } from '../../api/input-dto/get-comments-query-params.input-dto';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class CommentsQueryRepository {
   constructor(
     @InjectModel(Comment.name)
     private readonly commentModel: Model<CommentDocument>,
-    private readonly commentLikesRepository: CommentLikesRepository,
+    private readonly commentLikesRepository: CommentLikesQueryRepository,
   ) {}
 
   // async getAllPosts(

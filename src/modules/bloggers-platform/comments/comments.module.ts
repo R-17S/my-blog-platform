@@ -5,14 +5,14 @@ import { CommentsQueryRepository } from './infrastructure/query/comments.query-r
 import { forwardRef, Module } from '@nestjs/common';
 import { PostsModule } from '../posts/posts.module';
 import { CommentsRepository } from './infrastructure/comments.repository';
-import { CommentLikesRepository } from './infrastructure/comments.likes-repository';
-import { CommentLike, CommentLikeSchema } from './domain/comment.like-scheme';
+import { CommentLikesQueryRepository } from './infrastructure/query/comments.likes.query-repository';
+import { CommentLike, CommentLikeEntity } from './domain/comment.like-scheme';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Comment.name, schema: CommentEntity },
-      { name: CommentLike.name, schema: CommentLikeSchema },
+      { name: CommentLike.name, schema: CommentLikeEntity },
     ]),
     forwardRef(() => PostsModule), // ← нужен для проверки существования поста
   ],
@@ -21,7 +21,7 @@ import { CommentLike, CommentLikeSchema } from './domain/comment.like-scheme';
     CommentsRepository,
     CommentsQueryRepository,
     //CommentsService,
-    CommentLikesRepository,
+    CommentLikesQueryRepository,
   ],
   exports: [CommentsQueryRepository, CommentsRepository],
 })

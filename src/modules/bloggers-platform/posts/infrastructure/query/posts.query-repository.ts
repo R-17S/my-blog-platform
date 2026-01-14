@@ -7,13 +7,13 @@ import {
   PostViewModel,
 } from '../../api/view-dto/posts.view-dto';
 import { Post, PostDocument } from '../../domain/post.entity';
-import { PostLikesRepository } from '../posts.likes-repository';
+import { PostLikesQueryRepository } from './posts.likes.query-repository';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
-    private readonly postLikesRepository: PostLikesRepository,
+    private readonly postLikesRepository: PostLikesQueryRepository,
   ) {}
 
   async getAllPosts(

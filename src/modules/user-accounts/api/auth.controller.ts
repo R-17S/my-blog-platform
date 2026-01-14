@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { CreateUserInputDto } from './input-dto/users.input-dto';
@@ -21,6 +22,8 @@ import { AuthService } from '../application/auth.service';
 import { MeViewDto } from './view-dto/users.view-dto';
 import { AuthQueryRepository } from '../infrastructure/query/auth.query-repository';
 import { PostRateLimitGuard } from '../guards/throttler/rateLimit-auth.guard';
+import type { UserDocument } from '../domain/user.entity';
+import type { Response } from 'express';
 
 @Controller('auth')
 @UseGuards(PostRateLimitGuard)
@@ -53,10 +56,19 @@ export class AuthController {
   })
   login(
     /*@Request() req: any*/
-    @ExtractUserFromRequest() user: UserContextDto,
+    @ExtractUserFromRequest() user: UserDocument,
+    @Res({ passthrough: true }) res: Response,
   ): { accessToken: string } {
     //console.log('🔥 [Controller] login called with:', user.id);
-    return this.authService.login(user.id);
+    const { accessToken, refreshToken } = this.authService.login(user);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true, // обязательно в проде
+      sameSite: 'strict',
+      path: '/auth/refresh-token',
+    });
+    return { accessToken };
   }
 
   @ApiBearerAuth()

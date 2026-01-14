@@ -9,28 +9,63 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PostInputQuery } from './input-dto/get-posts-query-params.input-dto';
 import { PostsViewPaginated, PostViewModel } from './view-dto/posts.view-dto';
 import { PostsQueryRepository } from '../infrastructure/query/posts.query-repository';
 import { CreatePostDto } from '../dto/create-post.dto';
-import { PostsService } from '../application/posts.service';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { PostsRepository } from '../infrastructure/posts.repository';
 import { CurrentUserId } from '../../../../core/decorators/current-user-id.decorator';
-import { CommentsViewPaginated } from '../../comments/api/view-dto/comments.view-dto';
+import {
+  CommentsViewPaginated,
+  CommentViewModel,
+} from '../../comments/api/view-dto/comments.view-dto';
 import { CommentInputQuery } from '../../comments/api/input-dto/get-comments-query-params.input-dto';
 import { CommentsQueryRepository } from '../../comments/infrastructure/query/comments.query-repository';
+import { CreatePostCommand } from '../application/usecases/create-post.usecase';
+import { CommandBus } from '@nestjs/cqrs';
+import { UpdatePostCommand } from '../application/usecases/update-post.usecase';
+import { DeletePostCommand } from '../application/usecases/delete-post.usecase';
+import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
+import { ExtractUserFromRequest } from '../../../user-accounts/guards/decorators/param/extract-user-from-request.decorator';
+import { UserContextDto } from '../../../user-accounts/guards/dto/user-context.dto';
+import { CreateCommentDto } from '../../comments/dto/create-comment.dto';
+import { CreateCommentCommand } from '../../comments/application/usecases/create-comment.usecase';
+import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
+import { UpdateLikeStatusDto } from '../../../../core/dto/update-like-status.dto';
+import { UpdatePostLikeStatusCommand } from '../application/usecases/update-post-like-status-use.case';
 
 @Controller('posts')
 export class PostsController {
   constructor(
-    private readonly postsService: PostsService,
+    private readonly commandBus: CommandBus,
+    //private readonly postsService: PostsService,
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly postsRepository: PostsRepository,
     //private readonly commentsService: CommentsService,
     private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
+
+  @Put(':postId/like-status')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async updateLikeStatus(
+    @Param('postId') postId: string,
+    @Body() input: UpdateLikeStatusDto,
+    @ExtractUserFromRequest() user: UserContextDto,
+  ): Promise<void> {
+    await this.postsRepository.checkPostExistsOrError(postId);
+    await this.commandBus.execute(
+      new UpdatePostLikeStatusCommand(
+        postId,
+        user.id,
+        user.login,
+        input.likeStatus,
+      ),
+    );
+  }
 
   @Get(':postId/comments')
   async getCommentsByPostId(
@@ -38,12 +73,26 @@ export class PostsController {
     @Query() query: CommentInputQuery,
     @CurrentUserId() userId: string | undefined, // или использовать кастомный декоратор для userId, что бы я мог потом статус глянуть
   ): Promise<CommentsViewPaginated> {
-    await this.postsService.checkPostExistsOrError(postId);
+    await this.postsRepository.checkPostExistsOrError(postId);
     return await this.commentsQueryRepository.getCommentsByPostId(
       postId,
       query,
       userId,
     );
+  }
+
+  @Post(':postId/comments')
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(JwtAuthGuard)
+  async createComment(
+    @Param('postId') postId: string,
+    @Body() input: CreateCommentDto,
+    @ExtractUserFromRequest() user: UserContextDto,
+  ): Promise<CommentViewModel> {
+    const newCommentId = await this.commandBus.execute(
+      new CreateCommentCommand(input, postId, user.id, user.login),
+    );
+    return this.commentsQueryRepository.getCommentByIdOrError(newCommentId);
   }
 
   @Get()
@@ -56,8 +105,16 @@ export class PostsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(BasicAuthGuard)
   async createPost(@Body() input: CreatePostDto): Promise<PostViewModel> {
-    const newPostId = await this.postsService.createPost(input);
+    const newPostId = await this.commandBus.execute<CreatePostCommand, string>(
+      new CreatePostCommand(
+        input.title,
+        input.shortDescription,
+        input.content,
+        input.blogId,
+      ),
+    );
     return await this.postsQueryRepository.getPostByIdOrError(newPostId);
   }
 
@@ -71,16 +128,22 @@ export class PostsController {
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BasicAuthGuard)
   async updatePost(
     @Param('id') id: string,
     @Body() input: UpdatePostDto,
   ): Promise<void> {
-    await this.postsService.updatePost(id, input);
+    await this.commandBus.execute<UpdatePostCommand, void>(
+      new UpdatePostCommand(id, input),
+    );
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BasicAuthGuard)
   async deletePost(@Param('id') id: string): Promise<void> {
-    await this.postsService.deletePost(id);
+    await this.commandBus.execute<DeletePostCommand, void>(
+      new DeletePostCommand(id),
+    );
   }
 }

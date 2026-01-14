@@ -7,14 +7,14 @@ import { PostsService } from './application/posts.service';
 import { forwardRef, Module } from '@nestjs/common';
 import { BlogsModule } from '../blogs/blogs.module';
 import { CommentsModule } from '../comments/comments.module';
-import { PostLike, PostLikeSchema } from './domain/post.like-scheme';
-import { PostLikesRepository } from './infrastructure/posts.likes-repository';
+import { PostLike, PostLikeEntity } from './domain/post.like-scheme';
+import { PostLikesQueryRepository } from './infrastructure/query/posts.likes.query-repository';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Post.name, schema: PostEntity },
-      { name: PostLike.name, schema: PostLikeSchema },
+      { name: PostLike.name, schema: PostLikeEntity },
     ]),
     forwardRef(() => BlogsModule),
     forwardRef(() => CommentsModule),
@@ -24,12 +24,12 @@ import { PostLikesRepository } from './infrastructure/posts.likes-repository';
     PostsRepository,
     PostsQueryRepository,
     PostsService,
-    PostLikesRepository,
+    PostLikesQueryRepository,
   ],
   exports: [
     PostsRepository,
     PostsService,
-    PostLikesRepository,
+    PostLikesQueryRepository,
     PostsQueryRepository,
   ],
 })
