@@ -34,4 +34,4 @@ import { EmailModule } from './modules/user-accounts/email.module';
   providers: [AppService],
 })
 export class AppModule {}
-// console.log('✅ Оно работает, можно пока прочитать молитву духу машины');
+console.log('✅ Оно работает, можно пока прочитать молитву духу машины');
