@@ -24,22 +24,23 @@ import { AuthQueryRepository } from '../infrastructure/query/auth.query-reposito
 import { PostRateLimitGuard } from '../guards/throttler/rateLimit-auth.guard';
 import type { UserDocument } from '../domain/user.entity';
 import type { Response } from 'express';
+import { PasswordRecoveryCommand } from '../application/usecases/users/password-recovery.usecase';
+import { NewPasswordCommand } from '../application/usecases/users/new-password.usecase';
+import { ConfirmRegistrationCommand } from '../application/usecases/users/confirm-registration.usecase';
+import { RegisterUserCommand } from '../application/usecases/users/register-user.usecase';
+import { ResendRegistrationCommand } from '../application/usecases/users/recend-registration.usecase';
+import { CommandBus } from '@nestjs/cqrs';
+import { LoginUserCommand } from '../application/usecases/login-user.usecase';
 
 @Controller('auth')
 @UseGuards(PostRateLimitGuard)
 export class AuthController {
   constructor(
     //private usersService: UsersService,
+    private readonly commandBus: CommandBus,
     private authService: AuthService,
     private authQueryRepository: AuthQueryRepository,
   ) {}
-
-  @Post('registration')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  registration(@Body() body: CreateUserInputDto): Promise<void> {
-    console.log('🔥 [Controller] registration called with:', body);
-    return this.authService.registerUser(body);
-  }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -54,13 +55,16 @@ export class AuthController {
       },
     },
   })
-  login(
+  async login(
     /*@Request() req: any*/
     @ExtractUserFromRequest() user: UserDocument,
     @Res({ passthrough: true }) res: Response,
-  ): { accessToken: string } {
+  ): Promise<{ accessToken: string }> {
     //console.log('🔥 [Controller] login called with:', user.id);
-    const { accessToken, refreshToken } = this.authService.login(user);
+    //const { accessToken, refreshToken } = this.authService.login(user);
+    const { accessToken, refreshToken } = await this.commandBus.execute(
+      new LoginUserCommand(user),
+    );
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -81,27 +85,33 @@ export class AuthController {
   @Post('password-recovery')
   @HttpCode(HttpStatus.NO_CONTENT)
   passwordRecovery(@Body() dto: PasswordRecoveryDto): Promise<void> {
-    return this.authService.sendRecoveryCode(dto.email);
+    return this.commandBus.execute(new PasswordRecoveryCommand(dto.email));
   }
 
   @Post('new-password')
   @HttpCode(HttpStatus.NO_CONTENT)
   newPassword(@Body() dto: NewPasswordDto): Promise<void> {
-    return this.authService.confirmPasswordRecovery(
-      dto.newPassword,
-      dto.recoveryCode,
+    return this.commandBus.execute(
+      new NewPasswordCommand(dto.newPassword, dto.recoveryCode),
     );
   }
 
   @Post('registration-confirmation')
   @HttpCode(HttpStatus.NO_CONTENT)
   confirmRegistration(@Body() dto: RegistrationConfirmationDto): Promise<void> {
-    return this.authService.confirmRegistration(dto.code);
+    return this.commandBus.execute(new ConfirmRegistrationCommand(dto.code));
+  }
+
+  @Post('registration')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  registration(@Body() body: CreateUserInputDto): Promise<void> {
+    console.log('🔥 [Controller] registration called with:', body);
+    return this.commandBus.execute(new RegisterUserCommand(body));
   }
 
   @Post('registration-email-resending')
   @HttpCode(HttpStatus.NO_CONTENT)
   resendEmail(@Body() dto: EmailResendingDto): Promise<void> {
-    return this.authService.resendRegistrationEmail(dto.email);
+    return this.commandBus.execute(new ResendRegistrationCommand(dto.email));
   }
 }

@@ -117,7 +117,7 @@ window.onload = function() {
       },
       "/api/blogs/{id}": {
         "get": {
-          "operationId": "BlogsController_getPostById",
+          "operationId": "BlogsController_getBlogById",
           "parameters": [
             {
               "name": "id",
@@ -190,6 +190,39 @@ window.onload = function() {
           ]
         }
       },
+      "/api/posts/{postId}/like-status": {
+        "put": {
+          "operationId": "PostsController_updateLikeStatus",
+          "parameters": [
+            {
+              "name": "postId",
+              "required": true,
+              "in": "path",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateLikeStatusDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Posts"
+          ]
+        }
+      },
       "/api/posts/{postId}/comments": {
         "get": {
           "operationId": "PostsController_getCommentsByPostId",
@@ -205,6 +238,37 @@ window.onload = function() {
           ],
           "responses": {
             "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Posts"
+          ]
+        },
+        "post": {
+          "operationId": "PostsController_createComment",
+          "parameters": [
+            {
+              "name": "postId",
+              "required": true,
+              "in": "path",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCommentDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
               "description": ""
             }
           },
@@ -324,7 +388,92 @@ window.onload = function() {
           ]
         }
       },
+      "/api/comments/{commentId}/like-status": {
+        "put": {
+          "operationId": "CommentsController_updateCommentLikeStatus",
+          "parameters": [
+            {
+              "name": "commentId",
+              "required": true,
+              "in": "path",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateLikeStatusDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Comments"
+          ]
+        }
+      },
       "/api/comments/{id}": {
+        "put": {
+          "operationId": "CommentsController_updateComment",
+          "parameters": [
+            {
+              "name": "id",
+              "required": true,
+              "in": "path",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateCommentDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Comments"
+          ]
+        },
+        "delete": {
+          "operationId": "CommentsController_deleteComment",
+          "parameters": [
+            {
+              "name": "id",
+              "required": true,
+              "in": "path",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Comments"
+          ]
+        },
         "get": {
           "operationId": "CommentsController_getCommentById",
           "parameters": [
@@ -403,30 +552,6 @@ window.onload = function() {
           },
           "tags": [
             "Users"
-          ]
-        }
-      },
-      "/api/auth/registration": {
-        "post": {
-          "operationId": "AuthController_registration",
-          "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateUserInputDto"
-                }
-              }
-            }
-          },
-          "responses": {
-            "204": {
-              "description": ""
-            }
-          },
-          "tags": [
-            "Auth"
           ]
         }
       },
@@ -555,6 +680,30 @@ window.onload = function() {
           ]
         }
       },
+      "/api/auth/registration": {
+        "post": {
+          "operationId": "AuthController_registration",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserInputDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Auth"
+          ]
+        }
+      },
       "/api/auth/registration-email-resending": {
         "post": {
           "operationId": "AuthController_resendEmail",
@@ -623,15 +772,23 @@ window.onload = function() {
           "type": "object",
           "properties": {}
         },
+        "UpdateLikeStatusDto": {
+          "type": "object",
+          "properties": {}
+        },
+        "CreateCommentDto": {
+          "type": "object",
+          "properties": {}
+        },
         "UpdatePostDto": {
           "type": "object",
           "properties": {}
         },
-        "CreateUserDto": {
+        "UpdateCommentDto": {
           "type": "object",
           "properties": {}
         },
-        "CreateUserInputDto": {
+        "CreateUserDto": {
           "type": "object",
           "properties": {}
         },
@@ -644,6 +801,10 @@ window.onload = function() {
           "properties": {}
         },
         "RegistrationConfirmationDto": {
+          "type": "object",
+          "properties": {}
+        },
+        "CreateUserInputDto": {
           "type": "object",
           "properties": {}
         },

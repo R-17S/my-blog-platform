@@ -13,6 +13,7 @@ import {
 } from '../src/modules/user-accounts/api/view-dto/users.view-dto';
 import { delay } from './helpers/delay';
 import { EmailService } from '../src/modules/user-accounts/application/email.service';
+import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from '../src/modules/user-accounts/constans/auth-tokens.inject-constants';
 
 describe('users', () => {
   let app: INestApplication;
@@ -20,12 +21,14 @@ describe('users', () => {
 
   beforeAll(async () => {
     const result = await initSettings((moduleBuilder) => {
-      moduleBuilder.overrideProvider(JwtService).useValue(
-        new JwtService({
-          secret: 'access-token-secret', //TODO: move to env. will be in the following lessons
-          signOptions: { expiresIn: '2s' },
-        }),
-      );
+      moduleBuilder
+        .overrideProvider(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
+        .useValue(
+          new JwtService({
+            secret: 'access-token-secret', //TODO: move to env. will be in the following lessons
+            signOptions: { expiresIn: '2s' },
+          }),
+        );
 
       moduleBuilder.overrideProvider(EmailService).useValue({
         sendRegistrationEmail: jest.fn().mockResolvedValue(true),

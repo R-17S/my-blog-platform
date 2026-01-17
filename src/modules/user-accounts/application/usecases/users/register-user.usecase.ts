@@ -1,0 +1,69 @@
+import { CreateUserInputDto } from '../../../api/input-dto/users.input-dto';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import { UsersRepository } from '../../../infrastructure/users.repository';
+import { ArgonService } from '../../argon2.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from '../../../domain/user.entity';
+import type { UserModelType } from '../../../domain/user.entity';
+import { DomainException } from '../../../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
+import { randomUUID } from 'node:crypto';
+import { RegistrationEmailRequestedEvent } from '../../../domain/events/registration-email-requested.event';
+
+export class RegisterUserCommand {
+  constructor(public readonly input: CreateUserInputDto) {}
+}
+
+@CommandHandler(RegisterUserCommand)
+export class RegisterUserUseCase
+  implements ICommandHandler<RegisterUserCommand>
+{
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly argonService: ArgonService,
+    //private readonly emailService: EmailService,
+    private readonly eventBus: EventBus,
+    @InjectModel(User.name) private readonly userModel: UserModelType,
+  ) {}
+  async execute({ input }: RegisterUserCommand): Promise<void> {
+    const [loginExists, emailExists] = await Promise.all([
+      this.usersRepository.findByLogin(input.login),
+      this.usersRepository.findByEmail(input.email),
+    ]);
+
+    if (loginExists)
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Login should be unique',
+        extensions: [{ key: 'login', message: 'Login should be unique' }],
+      });
+    if (emailExists)
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Email should be unique',
+        extensions: [{ key: 'email', message: 'Email should be unique' }],
+      });
+
+    const passwordHash = await this.argonService.generateHash(input.password);
+    const confirmationCode = randomUUID();
+
+    const newUser = this.userModel.createForRegistration(
+      input.login,
+      input.email,
+      passwordHash,
+      confirmationCode,
+    );
+    console.log('🔥 [AuthService] user created:', newUser);
+
+    await this.usersRepository.save(newUser);
+
+    // await this.emailService.sendRegistrationEmail(
+    //   input.email,
+    //   confirmationCode,
+    // );
+    this.eventBus.publish(
+      new RegistrationEmailRequestedEvent(input.email, confirmationCode),
+    );
+    console.log('🔥 [AuthService] email sending triggered');
+  }
+}
