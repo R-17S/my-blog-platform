@@ -62,9 +62,10 @@ export class AuthController {
   ): Promise<{ accessToken: string }> {
     //console.log('🔥 [Controller] login called with:', user.id);
     //const { accessToken, refreshToken } = this.authService.login(user);
-    const { accessToken, refreshToken } = await this.commandBus.execute(
-      new LoginUserCommand(user),
-    );
+    const { accessToken, refreshToken } = await this.commandBus.execute<
+      any,
+      { accessToken: string; refreshToken: string }
+    >(new LoginUserCommand(user));
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,

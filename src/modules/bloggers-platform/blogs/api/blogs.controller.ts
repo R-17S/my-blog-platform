@@ -48,9 +48,9 @@ export class BlogsController {
     return this.blogsQueryRepository.getAllBlogs(query);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(BasicAuthGuard)
   async createBlog(@Body() input: CreateBlogDto): Promise<BlogViewModel> {
     const newBlogId = await this.commandBus.execute<CreateBlogCommand, string>(
       new CreateBlogCommand(input),
