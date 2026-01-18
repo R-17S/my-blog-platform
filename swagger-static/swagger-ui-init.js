@@ -559,26 +559,6 @@ window.onload = function() {
         "post": {
           "operationId": "AuthController_login",
           "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "login": {
-                      "type": "string",
-                      "example": "login123"
-                    },
-                    "password": {
-                      "type": "string",
-                      "example": "superpassword"
-                    }
-                  }
-                }
-              }
-            }
-          },
           "responses": {
             "200": {
               "description": ""
