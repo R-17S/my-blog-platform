@@ -4,7 +4,7 @@ import {
 } from '../../api/view-dto/blogs.view-dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../../domain/blog.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { BlogInputQuery } from '../../api/input-dto/get-blogs-query-params.input-dto';
 import { DomainException } from '../../../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
@@ -44,6 +44,12 @@ export class BlogsQueryRepository {
   }
 
   async getBlogByIdOrError(id: string): Promise<BlogViewModel> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Post not found',
+      });
+    }
     const result = await this.blogModel
       .findOne({ _id: id, deletedAt: null }) // фильтруем только "живые" блоги
       .lean();

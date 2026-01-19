@@ -1,19 +1,17 @@
-import { IsString, IsNotEmpty, Length } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
+import { IsStringWithTrim } from '../../../../core/decorators/validation/is-string-with-trim';
 
 export class UpdatePostDto {
-  @IsString()
   @IsNotEmpty()
-  @Length(1, 30)
+  @IsStringWithTrim(1, 30)
   title: string;
 
-  @IsString()
   @IsNotEmpty()
-  @Length(1, 100)
+  @IsStringWithTrim(1, 100)
   shortDescription: string;
 
-  @IsString()
   @IsNotEmpty()
-  @Length(1, 1000)
+  @IsStringWithTrim(1, 1000)
   content: string;
 
   @IsString()

@@ -1,16 +1,14 @@
-import { IsString, Length, Matches } from 'class-validator';
+import { Matches } from 'class-validator';
+import { IsStringWithTrim } from '../../../../core/decorators/validation/is-string-with-trim';
 
 export class UpdateBlogDto {
-  @IsString()
-  @Length(1, 15)
+  @IsStringWithTrim(1, 15)
   name: string;
 
-  @IsString()
-  @Length(1, 500)
+  @IsStringWithTrim(1, 500)
   description: string;
 
-  @IsString()
-  @Length(1, 100)
+  @IsStringWithTrim(1, 100)
   @Matches(
     /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
     {

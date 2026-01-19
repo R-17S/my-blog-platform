@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -9,6 +9,8 @@ import {
 import { Comment, CommentDocument } from '../../domain/comment.entity';
 import { CommentLikesQueryRepository } from './comments.likes.query-repository';
 import { CommentInputQuery } from '../../api/input-dto/get-comments-query-params.input-dto';
+import { DomainException } from '../../../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -52,7 +54,11 @@ export class CommentsQueryRepository {
     const result = await this.commentModel
       .findOne({ _id: id, deletedAt: null }) // фильтруем только "живые" блоги
       .lean();
-    if (!result) throw new NotFoundException('Comment not found');
+    if (!result)
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Comment not found',
+      });
 
     const statusesMap = userId
       ? await this.commentLikesRepository.getStatusesForComments(userId, [id])

@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { PostInputQuery } from '../../api/input-dto/get-posts-query-params.input-dto';
 import {
   PostsViewPaginated,
@@ -8,6 +8,8 @@ import {
 } from '../../api/view-dto/posts.view-dto';
 import { Post, PostDocument } from '../../domain/post.entity';
 import { PostLikesQueryRepository } from './posts.likes.query-repository';
+import { DomainException } from '../../../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -48,10 +50,20 @@ export class PostsQueryRepository {
     id: string,
     userId?: string,
   ): Promise<PostViewModel> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Post not found',
+      });
+    }
     const result = await this.postModel
-      .findOne({ _id: id, deletedAt: null }) // фильтруем только "живые" блоги
+      .findOne({ _id: id, deletedAt: null }) // фильтруем только "живые" посты
       .lean();
-    if (!result) throw new NotFoundException('Post not found');
+    if (!result)
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Post not found',
+      });
 
     const items = await this.postLikesRepository.enrichPostsWithLikes(
       [result],

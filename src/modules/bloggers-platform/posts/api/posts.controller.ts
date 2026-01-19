@@ -36,6 +36,7 @@ import { CreateCommentCommand } from '../../comments/application/usecases/create
 import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
 import { UpdateLikeStatusDto } from '../../../../core/dto/update-like-status.dto';
 import { UpdatePostLikeStatusCommand } from '../application/usecases/update-post-like-status-use.case';
+import { JwtOptionalAuthGuard } from '../../../user-accounts/guards/bearer/jwt-optional-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -119,6 +120,7 @@ export class PostsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtOptionalAuthGuard)
   async getPostById(
     @Param('id') id: string,
     @CurrentUserId() userId: string | undefined,

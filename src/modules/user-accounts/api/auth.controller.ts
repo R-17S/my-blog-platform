@@ -45,16 +45,6 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
-  //swagger doc
-  // @ApiBody({
-  //   schema: {
-  //     type: 'object',
-  //     properties: {
-  //       login: { type: 'string', example: 'login123' },
-  //       password: { type: 'string', example: 'superpassword' },
-  //     },
-  //   },
-  // })
   async login(
     /*@Request() req: any*/
     @ExtractUserFromRequest() user: UserDocument,

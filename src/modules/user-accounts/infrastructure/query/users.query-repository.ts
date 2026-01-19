@@ -1,12 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User, UserDocument } from '../../domain/user.entity';
 import {
   UsersViewPaginated,
   UserViewModel,
 } from '../../api/view-dto/users.view-dto';
 import { UserInputQuery } from '../../api/input-dto/get-users-query-params.input-dto';
+import { DomainException } from '../../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -48,10 +50,20 @@ export class UsersQueryRepository {
   }
 
   async getUserByIdOrError(id: string): Promise<UserViewModel> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Post not found',
+      });
+    }
     const result = await this.userModel
       .findOne({ _id: id, deletedAt: null }) // фильтруем только "живые" блоги
       .lean();
-    if (!result) throw new NotFoundException('User not found');
+    if (!result)
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'User not found',
+      });
     return UserViewModel.mapToView(result);
   }
 }

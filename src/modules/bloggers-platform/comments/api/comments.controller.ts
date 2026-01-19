@@ -21,6 +21,7 @@ import { UserContextDto } from '../../../user-accounts/guards/dto/user-context.d
 import { DeleteCommentCommand } from '../application/usecases/delete-comment.usecase';
 import { UpdateLikeStatusDto } from '../../../../core/dto/update-like-status.dto';
 import { UpdateCommentLikeStatusCommand } from '../application/usecases/update-comment-like-status.usecase';
+import { JwtOptionalAuthGuard } from '../../../user-accounts/guards/bearer/jwt-optional-auth.guard';
 
 @Controller('comments')
 export class CommentsController {
@@ -70,6 +71,7 @@ export class CommentsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtOptionalAuthGuard)
   async getCommentById(
     @Param('id') id: string,
     @CurrentUserId() userId: string | undefined,
