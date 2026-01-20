@@ -125,9 +125,9 @@ export class PostsController {
   @UseGuards(JwtOptionalAuthGuard)
   async getPostById(
     @Param('id') id: string,
-    @CurrentUserId() userId: string | undefined,
+    @ExtractUserFromRequest() user: UserContextDto,
   ) {
-    return await this.postsQueryRepository.getPostByIdOrError(id, userId);
+    return await this.postsQueryRepository.getPostByIdOrError(id, user.id);
   }
 
   @Put(':id')
