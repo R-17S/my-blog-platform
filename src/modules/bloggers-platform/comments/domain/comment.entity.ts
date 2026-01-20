@@ -64,9 +64,6 @@ export class Comment {
    * Marks comment as deleted (soft delete)
    */
   makeDeleted() {
-    if (this.deletedAt !== null) {
-      throw new NotFoundException('Comment already deleted');
-    }
     this.deletedAt = new Date();
   }
 }

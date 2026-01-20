@@ -70,16 +70,17 @@ export class PostsController {
   }
 
   @Get(':postId/comments')
+  @UseGuards(JwtOptionalAuthGuard)
   async getCommentsByPostId(
     @Param('postId') postId: string,
     @Query() query: CommentInputQuery,
-    @CurrentUserId() userId: string | undefined, // или использовать кастомный декоратор для userId, что бы я мог потом статус глянуть
+    @ExtractUserIfExistsFromRequest() user: UserContextDto, // или использовать кастомный декоратор для userId, что бы я мог потом статус глянуть
   ): Promise<CommentsViewPaginated> {
     await this.postsRepository.checkPostExistsOrError(postId);
     return await this.commentsQueryRepository.getCommentsByPostId(
       postId,
       query,
-      userId,
+      user.id,
     );
   }
 
@@ -102,7 +103,7 @@ export class PostsController {
   @UseGuards(JwtOptionalAuthGuard)
   async getPosts(
     @Query() query: PostInputQuery,
-    @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
+    @ExtractUserIfExistsFromRequest() user: UserContextDto,
   ): Promise<PostsViewPaginated> {
     console.log('getPosts → userId:', user);
     return this.postsQueryRepository.getAllPosts(query, user?.id);
@@ -127,7 +128,7 @@ export class PostsController {
   @UseGuards(JwtOptionalAuthGuard)
   async getPostById(
     @Param('id') id: string,
-    @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
+    @ExtractUserIfExistsFromRequest() user: UserContextDto,
   ) {
     return await this.postsQueryRepository.getPostByIdOrError(id, user?.id);
   }
