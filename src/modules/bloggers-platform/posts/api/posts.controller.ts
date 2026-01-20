@@ -91,9 +91,10 @@ export class PostsController {
     @Body() input: CreateCommentDto,
     @ExtractUserFromRequest() user: UserContextDto,
   ): Promise<CommentViewModel> {
-    const newCommentId = await this.commandBus.execute(
-      new CreateCommentCommand(input, postId, user.id, user.login),
-    );
+    const newCommentId = await this.commandBus.execute<
+      CreateCommentCommand,
+      string
+    >(new CreateCommentCommand(input, postId, user.id, user.login));
     return this.commentsQueryRepository.getCommentByIdOrError(newCommentId);
   }
 
@@ -101,10 +102,10 @@ export class PostsController {
   @UseGuards(JwtOptionalAuthGuard)
   async getPosts(
     @Query() query: PostInputQuery,
-    @ExtractUserIfExistsFromRequest() user: UserContextDto,
+    @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
   ): Promise<PostsViewPaginated> {
     console.log('getPosts → userId:', user);
-    return this.postsQueryRepository.getAllPosts(query, user.id);
+    return this.postsQueryRepository.getAllPosts(query, user?.id);
   }
 
   @Post()
@@ -126,9 +127,9 @@ export class PostsController {
   @UseGuards(JwtOptionalAuthGuard)
   async getPostById(
     @Param('id') id: string,
-    @ExtractUserIfExistsFromRequest() user: UserContextDto,
+    @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
   ) {
-    return await this.postsQueryRepository.getPostByIdOrError(id, user.id);
+    return await this.postsQueryRepository.getPostByIdOrError(id, user?.id);
   }
 
   @Put(':id')

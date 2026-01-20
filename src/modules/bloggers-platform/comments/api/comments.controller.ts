@@ -74,11 +74,11 @@ export class CommentsController {
   @UseGuards(JwtOptionalAuthGuard)
   async getCommentById(
     @Param('id') id: string,
-    @ExtractUserIfExistsFromRequest() user: UserContextDto,
+    @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
   ) {
     return await this.commentsQueryRepository.getCommentByIdOrError(
       id,
-      user.id,
+      user?.id,
     );
   }
 }
