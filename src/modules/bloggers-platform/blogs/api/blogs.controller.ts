@@ -31,6 +31,9 @@ import { UpdateBlogCommand } from '../application/usecases/update-blog.usecase';
 import { DeleteBlogCommand } from '../application/usecases/delete-blog.usecase';
 import { CreatePostCommand } from '../../posts/application/usecases/create-post.usecase';
 import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
+import { JwtOptionalAuthGuard } from '../../../user-accounts/guards/bearer/jwt-optional-auth.guard';
+import { ExtractUserIfExistsFromRequest } from '../../../user-accounts/guards/decorators/param/extract-user-if-exists-from-request.decorator';
+import { UserContextDto } from '../../../user-accounts/guards/dto/user-context.dto';
 
 @Controller('blogs')
 export class BlogsController {
@@ -59,16 +62,17 @@ export class BlogsController {
   }
 
   @Get(':blogId/posts')
+  @UseGuards(JwtOptionalAuthGuard)
   async getPostsByBlogId(
     @Param('blogId') blogId: string,
     @Query() query: PostInputQuery,
-    @CurrentUserId() userId: string | undefined, // или использовать кастомный декоратор для userId, что бы я мог потом статус глянуть
+    @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
   ): Promise<PostsViewPaginated> {
     await this.blogsRepository.checkBlogExistsOrError(blogId);
     return await this.postsQueryRepository.getPostsByBlogId(
       blogId,
       query,
-      userId,
+      user?.id,
     );
   }
 

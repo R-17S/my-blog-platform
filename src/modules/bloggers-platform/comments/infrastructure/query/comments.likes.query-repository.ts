@@ -29,6 +29,49 @@ export class CommentLikesQueryRepository {
     return map;
   }
 
+  async getLikesCountForComments(
+    commentIds: string[],
+  ): Promise<Record<string, number>> {
+    const likes = await this.likeModel.aggregate<{
+      _id: string;
+      count: number;
+    }>([
+      {
+        $match: {
+          commentId: { $in: commentIds },
+          status: LikeStatusTypes.Like,
+        },
+      },
+      { $group: { _id: '$commentId', count: { $sum: 1 } } },
+    ]);
+    const map: Record<string, number> = {};
+    for (const like of likes) {
+      map[like._id] = like.count;
+    }
+    return map;
+  }
+  async getDislikesCountForComments(
+    commentIds: string[],
+  ): Promise<Record<string, number>> {
+    const dislikes = await this.likeModel.aggregate<{
+      _id: string;
+      count: number;
+    }>([
+      {
+        $match: {
+          commentId: { $in: commentIds },
+          status: LikeStatusTypes.Dislike,
+        },
+      },
+      { $group: { _id: '$commentId', count: { $sum: 1 } } },
+    ]);
+    const map: Record<string, number> = {};
+    for (const dislike of dislikes) {
+      map[dislike._id] = dislike.count;
+    }
+    return map;
+  }
+
   // async getNewestLikesForPosts(
   //   postIds: string[],
   // ): Promise<Record<string, NewestLikeViewModel[]>> {

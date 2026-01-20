@@ -23,6 +23,8 @@ export class CommentViewModel {
   static mapToView(
     comment: CommentDocument,
     myStatus: LikeStatusTypes,
+    likesCount: number,
+    dislikesCount: number,
   ): CommentViewModel {
     return {
       id: comment._id.toString(),
@@ -33,8 +35,8 @@ export class CommentViewModel {
       },
       createdAt: comment.createdAt,
       likesInfo: {
-        likesCount: comment.likesCount ?? 0,
-        dislikesCount: comment.dislikesCount ?? 0,
+        likesCount,
+        dislikesCount,
         myStatus,
       },
     };

@@ -52,21 +52,32 @@ export class CommentsQueryRepository {
     userId?: string,
   ): Promise<CommentViewModel> {
     const result = await this.commentModel
-      .findOne({ _id: id, deletedAt: null }) // фильтруем только "живые" блоги
+      .findOne({ _id: id, deletedAt: null }) // фильтруем только "живые" комменты
       .lean();
     if (!result)
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
         message: 'Comment not found',
       });
-
+    const commentId = result._id.toString();
+    const [likesMap, dislikesMap] = await Promise.all([
+      this.commentLikesRepository.getLikesCountForComments([commentId]),
+      this.commentLikesRepository.getDislikesCountForComments([commentId]),
+    ]);
     const statusesMap = userId
       ? await this.commentLikesRepository.getStatusesForComments(userId, [id])
       : {};
 
     const myStatus = statusesMap[id] ?? LikeStatusTypes.None;
+    const likesCount = likesMap[commentId] ?? 0;
+    const dislikesCount = dislikesMap[commentId] ?? 0;
 
-    return CommentViewModel.mapToView(result, myStatus);
+    return CommentViewModel.mapToView(
+      result,
+      myStatus,
+      likesCount,
+      dislikesCount,
+    );
   }
 
   async getCommentsByPostId(
@@ -87,7 +98,10 @@ export class CommentsQueryRepository {
     ]);
 
     const commentIds = comments.map((comment) => comment._id.toString());
-
+    const [likesMap, dislikesMap] = await Promise.all([
+      this.commentLikesRepository.getLikesCountForComments(commentIds),
+      this.commentLikesRepository.getDislikesCountForComments(commentIds),
+    ]);
     const statusesMap = userId
       ? await this.commentLikesRepository.getStatusesForComments(
           userId,
@@ -99,6 +113,8 @@ export class CommentsQueryRepository {
       CommentViewModel.mapToView(
         comment,
         statusesMap[comment._id.toString()] ?? LikeStatusTypes.None,
+        likesMap[comment._id.toString()] ?? 0,
+        dislikesMap[comment._id.toString()] ?? 0,
       ),
     );
 
