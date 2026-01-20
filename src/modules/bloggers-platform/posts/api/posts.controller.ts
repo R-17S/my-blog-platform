@@ -37,6 +37,7 @@ import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.g
 import { UpdateLikeStatusDto } from '../../../../core/dto/update-like-status.dto';
 import { UpdatePostLikeStatusCommand } from '../application/usecases/update-post-like-status-use.case';
 import { JwtOptionalAuthGuard } from '../../../user-accounts/guards/bearer/jwt-optional-auth.guard';
+import { ExtractUserIfExistsFromRequest } from '../../../user-accounts/guards/decorators/param/extract-user-if-exists-from-request.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -100,7 +101,7 @@ export class PostsController {
   @UseGuards(JwtOptionalAuthGuard)
   async getPosts(
     @Query() query: PostInputQuery,
-    @ExtractUserFromRequest() user: UserContextDto,
+    @ExtractUserIfExistsFromRequest() user: UserContextDto,
   ): Promise<PostsViewPaginated> {
     console.log('getPosts → userId:', user);
     return this.postsQueryRepository.getAllPosts(query, user.id);
@@ -125,7 +126,7 @@ export class PostsController {
   @UseGuards(JwtOptionalAuthGuard)
   async getPostById(
     @Param('id') id: string,
-    @ExtractUserFromRequest() user: UserContextDto,
+    @ExtractUserIfExistsFromRequest() user: UserContextDto,
   ) {
     return await this.postsQueryRepository.getPostByIdOrError(id, user.id);
   }

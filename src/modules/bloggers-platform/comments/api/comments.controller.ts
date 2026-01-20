@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 
 import { CommentsQueryRepository } from '../infrastructure/query/comments.query-repository';
-import { CurrentUserId } from '../../../../core/decorators/current-user-id.decorator';
 import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { UpdateCommentCommand } from '../application/usecases/update-comment.usecase';
@@ -22,6 +21,7 @@ import { DeleteCommentCommand } from '../application/usecases/delete-comment.use
 import { UpdateLikeStatusDto } from '../../../../core/dto/update-like-status.dto';
 import { UpdateCommentLikeStatusCommand } from '../application/usecases/update-comment-like-status.usecase';
 import { JwtOptionalAuthGuard } from '../../../user-accounts/guards/bearer/jwt-optional-auth.guard';
+import { ExtractUserIfExistsFromRequest } from '../../../user-accounts/guards/decorators/param/extract-user-if-exists-from-request.decorator';
 
 @Controller('comments')
 export class CommentsController {
@@ -74,8 +74,11 @@ export class CommentsController {
   @UseGuards(JwtOptionalAuthGuard)
   async getCommentById(
     @Param('id') id: string,
-    @CurrentUserId() userId: string | undefined,
+    @ExtractUserIfExistsFromRequest() user: UserContextDto,
   ) {
-    return await this.commentsQueryRepository.getCommentByIdOrError(id, userId);
+    return await this.commentsQueryRepository.getCommentByIdOrError(
+      id,
+      user.id,
+    );
   }
 }
