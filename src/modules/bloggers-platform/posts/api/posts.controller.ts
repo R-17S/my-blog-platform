@@ -57,7 +57,7 @@ export class PostsController {
     @Body() input: UpdateLikeStatusDto,
     @ExtractUserFromRequest() user: UserContextDto,
   ): Promise<void> {
-    await this.postsRepository.checkPostExistsOrError(postId);
+    //await this.postsRepository.checkPostExistsOrError(postId);
     await this.commandBus.execute(
       new UpdatePostLikeStatusCommand(
         postId,
@@ -97,11 +97,13 @@ export class PostsController {
   }
 
   @Get()
+  @UseGuards(JwtOptionalAuthGuard)
   async getPosts(
     @Query() query: PostInputQuery,
-    @CurrentUserId() userId: string | undefined,
+    @ExtractUserFromRequest() user: UserContextDto,
   ): Promise<PostsViewPaginated> {
-    return this.postsQueryRepository.getAllPosts(query, userId);
+    console.log('getPosts → userId:', user);
+    return this.postsQueryRepository.getAllPosts(query, user.id);
   }
 
   @Post()

@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { PostLike, PostLikeDocument } from '../domain/post.like-scheme';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -18,7 +18,6 @@ export class PostLikesRepository {
     postId: string,
     userId: string,
   ): Promise<PostLikeDocument | null> {
-    if (!Types.ObjectId.isValid(postId)) return null;
     return this.postLikeModel.findOne({ postId, userId });
   }
 

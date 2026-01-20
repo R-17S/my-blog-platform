@@ -30,6 +30,8 @@ export class PostViewModel {
     post: PostDocument,
     myStatus: LikeStatusTypes,
     newestLikes: Array<{ addedAt: Date; userId: string; login: string }>,
+    likesCount: number,
+    dislikesCount: number,
   ): PostViewModel {
     return {
       id: post._id.toString(),
@@ -40,8 +42,8 @@ export class PostViewModel {
       blogName: post.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: post.likesCount ?? 0,
-        dislikesCount: post.dislikesCount ?? 0,
+        likesCount,
+        dislikesCount,
         myStatus,
         newestLikes,
       },
