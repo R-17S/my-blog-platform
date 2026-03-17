@@ -4,7 +4,7 @@ import { initSettings } from './helpers/init-settings';
 import { JwtService } from '@nestjs/jwt';
 import { deleteAllData } from './helpers/delete-all-data';
 import { CreateUserDto } from '../src/modules/user-accounts/dto/create-user.dto';
-import request from 'supertest';
+import * as request from 'supertest';
 import { GLOBAL_PREFIX } from '../src/setup/global-prefix.setup';
 import { PaginatedViewDto } from '../src/core/dto/base.paginated.view-dto';
 import {
@@ -100,6 +100,9 @@ describe('users', () => {
     await userTestManager.me(tokens[0].accessToken, HttpStatus.UNAUTHORIZED);
   });
 
+  // -----------------------------
+  // РЕГИСТРАЦИЯ
+  // -----------------------------
   it(`should register user without really send email`, async () => {
     await request(app.getHttpServer())
       .post(`/${GLOBAL_PREFIX}/auth/registration`)
@@ -128,7 +131,7 @@ describe('users', () => {
     expect(sendEmailMethod).toHaveBeenCalled();
   });
 });
-//
+
 // describe('users', () => {
 //   it('dummy test', () => {
 //     expect(true).toBe(true);

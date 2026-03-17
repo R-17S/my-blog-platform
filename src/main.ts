@@ -1,13 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { appSetup } from './setup/app.setup';
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
 // core
 import { createWriteStream } from 'fs';
 import { get } from 'http';
 
-const result = dotenv.config();
-console.log('Loaded from .env:', result.parsed);
+const result = config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   appSetup(app);

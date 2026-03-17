@@ -1,3 +1,4 @@
+import * as cookieParser from 'cookie-parser';
 import { INestApplication } from '@nestjs/common';
 import { pipesSetup } from './pipes.setup';
 import { globalPrefixSetup } from './global-prefix.setup';
@@ -6,6 +7,7 @@ import { AllHttpExceptionsFilter } from '../core/exceptions/filters/all-exceptio
 import { DomainHttpExceptionsFilter } from '../core/exceptions/filters/domain-exceptions.filter';
 
 export function appSetup(app: INestApplication) {
+  app.use(cookieParser());
   app.enableCors();
   app.useGlobalFilters(
     new AllHttpExceptionsFilter(), // потом всё остальное

@@ -14,7 +14,6 @@ import { SwaggerErrorResponse } from '../swagger-dto';
 @Catch(DomainException)
 export class DomainHttpExceptionsFilter implements ExceptionFilter {
   catch(exception: DomainException, host: ArgumentsHost): void {
-    console.log('🔥 Может ты уже начнёшь работать', exception);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();

@@ -3,6 +3,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from './application/email.service';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import path from 'node:path';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import path from 'node:path';
         from: '"My App" <no-reply@myapp.com>',
       },
       template: {
-        dir: path.join(__dirname, 'templates'), // ← путь к папке с .hbs
+        dir: join(__dirname, 'templates'), // ← путь к папке с .hbs
         adapter: new HandlebarsAdapter(),
         options: { strict: true },
       },

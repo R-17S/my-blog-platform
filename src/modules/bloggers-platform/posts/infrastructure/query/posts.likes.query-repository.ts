@@ -21,7 +21,6 @@ export class PostLikesQueryRepository {
     userId: string,
     postIds: string[],
   ): Promise<Record<string, LikeStatusTypes>> {
-    console.log('getStatusesForPosts → userId:', userId);
     const likes = await this.likeModel
       .find({ userId, postId: { $in: postIds } })
       .lean();
@@ -87,7 +86,6 @@ export class PostLikesQueryRepository {
   ): Promise<PostViewModel[]> {
     const postIds = posts.map((p) => p._id.toString());
 
-    console.log('enrichPostsWithLikes → userId:', userId);
     const [statusesMap, newestLikesMap, likesCountMap, dislikesCountMap] =
       await Promise.all([
         userId ? this.getStatusesForPosts(userId, postIds) : {},

@@ -22,6 +22,13 @@ import {
 } from './constans/auth-tokens.inject-constants';
 import { LoginUserUseCase } from './application/usecases/login-user.usecase';
 import { CqrsModule } from '@nestjs/cqrs';
+import { JwtRefreshStrategy } from './guards/bearer/jwtRefresh.strategy';
+import { LogoutUserUseCase } from './application/usecases/logout-user.usecase';
+import { RefreshTokensUseCase } from './application/usecases/refresh-token.usecase';
+import { PassportModule } from '@nestjs/passport';
+import { Devices, DevicesEntity } from './domain/securityDevices.entity';
+import { CoreConfig } from '../../core/core.config';
+import { UserAccountsConfig } from './config/user-accounts.config';
 
 @Module({
   imports: [
@@ -29,31 +36,45 @@ import { CqrsModule } from '@nestjs/cqrs';
     JwtModule,
     UserAccountsModule,
     EmailModule,
-    MongooseModule.forFeature([{ name: User.name, schema: UserEntity }]),
+    PassportModule,
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserEntity },
+      { name: Devices.name, schema: DevicesEntity },
+    ]),
   ],
   controllers: [AuthController],
   providers: [
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
-      useFactory: (): JwtService => {
+      useFactory: (
+        coreConfig: CoreConfig,
+        userAccountsConfig: UserAccountsConfig,
+      ): JwtService => {
         return new JwtService({
-          secret: 'access-token-secret', //TODO: move to env. will be in the following lessons
-          signOptions: { expiresIn: '5m' },
+          secret: coreConfig.accessTokenSecret, //TODO: move to env. will be in the following lessons
+          signOptions: { expiresIn: userAccountsConfig.accessTokenExpireIn },
         });
       },
       inject: [
+        CoreConfig,
+        UserAccountsConfig,
         /*TODO: inject configService. will be in the following lessons*/
       ],
     },
     {
       provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
-      useFactory: (): JwtService => {
+      useFactory: (
+        coreConfig: CoreConfig,
+        userAccountsConfig: UserAccountsConfig,
+      ): JwtService => {
         return new JwtService({
-          secret: 'refresh-token-secret', //TODO: move to env. will be in the following lessons
-          signOptions: { expiresIn: '10m' },
+          secret: coreConfig.refreshTokenSecret, //TODO: move to env. will be in the following lessons
+          signOptions: { expiresIn: userAccountsConfig.refreshTokenExpireIn },
         });
       },
       inject: [
+        CoreConfig,
+        UserAccountsConfig,
         /*TODO: inject configService. will be in the following lessons*/
       ],
     },
@@ -65,10 +86,13 @@ import { CqrsModule } from '@nestjs/cqrs';
     PasswordRecoveryUseCase,
     NewPasswordUserUseCase,
     LoginUserUseCase,
+    LogoutUserUseCase,
+    RefreshTokensUseCase,
     //
     AuthQueryRepository,
     LocalStrategy,
     JwtStrategy,
+    JwtRefreshStrategy,
     //
     SendRegistrationEmailHandler,
     SendRecoveryEmailHandler,

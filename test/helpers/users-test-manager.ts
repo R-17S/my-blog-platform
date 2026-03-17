@@ -4,12 +4,18 @@ import {
   MeViewDto,
   UserViewModel,
 } from '../../src/modules/user-accounts/api/view-dto/users.view-dto';
-import request from 'supertest';
+import * as request from 'supertest';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
 import { delay } from './delay';
+import { CreateUserDto } from '../../src/modules/user-accounts/dto/create-user.dto';
+import { DevicesViewModel } from '../../src/modules/user-accounts/api/view-dto/securityDevices.view-dto';
+import { UsersRepository } from '../../src/modules/user-accounts/infrastructure/users.repository';
 
 export class UsersTestManager {
-  constructor(private app: INestApplication) {}
+  constructor(
+    private app: INestApplication,
+    //private readonly usersRepository: UsersRepository,
+  ) {}
 
   async createUser(
     createModel: CreateUserInputDto,
@@ -42,7 +48,7 @@ export class UsersTestManager {
     loginOrEmail: string,
     password: string,
     statusCode: number = HttpStatus.OK,
-  ): Promise<{ accessToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     console.log(
       '🔥 [TestManager] данные вообще приходят ',
       loginOrEmail,
@@ -53,9 +59,12 @@ export class UsersTestManager {
       .send({ loginOrEmail, password })
       .expect(statusCode);
     expect(response.status).toBe(statusCode);
-    return {
-      accessToken: response.body.accessToken,
-    };
+
+    const accessToken: string = response.body.accessToken as string;
+    const refreshToken = response.headers['set-cookie'][0]
+      .split(';')[0]
+      .replace('refreshToken=', '');
+    return { accessToken, refreshToken };
   }
 
   async me(
@@ -91,7 +100,7 @@ export class UsersTestManager {
 
   async createAndLoginSeveralUsers(
     count: number,
-  ): Promise<{ accessToken: string }[]> {
+  ): Promise<{ accessToken: string; refreshToken: string }[]> {
     const users = await this.createSeveralUsers(count);
     console.log('🔥 [TestManager] users created:', users);
 
@@ -103,5 +112,58 @@ export class UsersTestManager {
     // хочешь увидеть результат промиса const tokens = await Promise.all(loginPromises);
 
     return await Promise.all(loginPromises);
+  }
+
+  async getRecoveryCode(email: string): Promise<string> {
+    const usersRepository = this.app.get(UsersRepository);
+    const user = await usersRepository.findByEmail(email);
+    if (!user) {
+      throw new Error(`User with email ${email} not found`);
+    }
+    const code = user.passwordRecovery?.recoveryCode;
+    if (!code) {
+      throw new Error(`Recovery code for ${email} not found`);
+    }
+    return code;
+  }
+
+  async createAndLoginSingleUser(): Promise<{
+    accessToken: string;
+    refreshToken: string;
+  }> {
+    const body: CreateUserDto = {
+      login: 'name1',
+      password: 'qwerty',
+      email: 'email@email.em',
+    };
+
+    await this.createUser(body);
+    const { accessToken, refreshToken } = await this.login(
+      body.login,
+      body.password,
+    );
+    return { accessToken, refreshToken };
+  }
+
+  async getDevices(
+    refreshToken: string,
+    statusCode: number = HttpStatus.OK,
+  ): Promise<DevicesViewModel> {
+    const response = await request(this.app.getHttpServer())
+      .get(`/${GLOBAL_PREFIX}/security/devices`)
+      .set('Cookie', `refreshToken=${refreshToken}`)
+      .expect(statusCode);
+    return response.body as DevicesViewModel;
+  }
+
+  async refreshToken(
+    refreshToken: string,
+    statusCode: number = HttpStatus.OK,
+  ): Promise<{ accessToken: string }> {
+    const response = await request(this.app.getHttpServer())
+      .post(`/${GLOBAL_PREFIX}/auth/refresh-token`)
+      .set('Cookie', `refreshToken=${refreshToken}`)
+      .expect(statusCode);
+    return response.body as { accessToken: string };
   }
 }

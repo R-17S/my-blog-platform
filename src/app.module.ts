@@ -11,12 +11,13 @@ import { join } from 'path';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './modules/user-accounts/auth.module';
 import { EmailModule } from './modules/user-accounts/email.module';
+import { configModule } from './config-dynamic-module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    configModule,
     MongooseModule.forRoot(
-      process.env.MONGO_URL ??
+      process.env.MONGO_URL_LOCAL ??
         'mongodb://localhost:27017/nest-blogger-platform',
     ),
     ServeStaticModule.forRoot({

@@ -105,7 +105,6 @@ export class PostsController {
     @Query() query: PostInputQuery,
     @ExtractUserIfExistsFromRequest() user: UserContextDto,
   ): Promise<PostsViewPaginated> {
-    console.log('getPosts → userId:', user);
     return this.postsQueryRepository.getAllPosts(query, user?.id);
   }
 

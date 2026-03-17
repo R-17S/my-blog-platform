@@ -555,6 +555,55 @@ window.onload = function() {
           ]
         }
       },
+      "/api/security/devices": {
+        "get": {
+          "operationId": "SecurityDevicesController_getDevices",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "SecurityDevices"
+          ]
+        },
+        "delete": {
+          "operationId": "SecurityDevicesController_deleteAllDevicesExceptCurrent",
+          "parameters": [],
+          "responses": {
+            "204": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "SecurityDevices"
+          ]
+        }
+      },
+      "/api/security/devices/{deviceId}": {
+        "delete": {
+          "operationId": "SecurityDevicesController_deleteDeviceById",
+          "parameters": [
+            {
+              "name": "deviceId",
+              "required": true,
+              "in": "path",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "SecurityDevices"
+          ]
+        }
+      },
       "/api/auth/login": {
         "post": {
           "operationId": "AuthController_login",
@@ -698,6 +747,34 @@ window.onload = function() {
               }
             }
           },
+          "responses": {
+            "204": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Auth"
+          ]
+        }
+      },
+      "/api/auth/refresh-token": {
+        "post": {
+          "operationId": "AuthController_refreshTokens",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Auth"
+          ]
+        }
+      },
+      "/api/auth/logout": {
+        "post": {
+          "operationId": "AuthController_logout",
+          "parameters": [],
           "responses": {
             "204": {
               "description": ""
