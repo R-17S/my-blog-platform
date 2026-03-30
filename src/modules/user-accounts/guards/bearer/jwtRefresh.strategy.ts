@@ -32,7 +32,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
           return cookies['refreshToken'] ?? null;
         },
       ]),
-      ignoreExpiration: true,
+      ignoreExpiration: false,
       secretOrKey: coreConfig.refreshTokenSecret,
       passReqToCallback: true,
     });
