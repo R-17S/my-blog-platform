@@ -2,29 +2,32 @@ import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from './application/email.service';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import path from 'node:path';
 import { join } from 'path';
+import { CoreConfig } from '../../core/core.config';
 
 @Module({
   imports: [
-    MailerModule.forRoot({
-      transport: {
-        service: 'gmail',
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS2,
+    MailerModule.forRootAsync({
+      inject: [CoreConfig],
+      useFactory: (coreConfig: CoreConfig) => ({
+        transport: {
+          service: 'gmail',
+          auth: {
+            user: coreConfig.smtpUser,
+            pass: coreConfig.smtpPass,
+          },
+          //logger: true, // ← логирование SMTP
+          //debug: true, // ← подробные SMTP-логи
         },
-        //logger: true, // ← логирование SMTP
-        //debug: true, // ← подробные SMTP-логи
-      },
-      defaults: {
-        from: '"My App" <no-reply@myapp.com>',
-      },
-      template: {
-        dir: join(__dirname, 'templates'), // ← путь к папке с .hbs
-        adapter: new HandlebarsAdapter(),
-        options: { strict: true },
-      },
+        defaults: {
+          from: '"My App" <no-reply@myapp.com>',
+        },
+        template: {
+          dir: join(__dirname, 'templates'), // ← путь к папке с .hbs
+          adapter: new HandlebarsAdapter(),
+          options: { strict: true },
+        },
+      }),
     }),
   ],
   providers: [EmailService],

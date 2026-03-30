@@ -1,5 +1,5 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { configModule } from './config-dynamic-module';
+import { DynamicModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BloggersPlatformModule } from './modules/bloggers-platform/bloggers-platform.module';
@@ -11,28 +11,62 @@ import { join } from 'path';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './modules/user-accounts/auth.module';
 import { EmailModule } from './modules/user-accounts/email.module';
-import { configModule } from './config-dynamic-module';
+import { CoreConfig } from './core/core.config';
+import { CoreModule } from './core/core.module';
+import { APP_FILTER } from '@nestjs/core';
+import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
+import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
 
 @Module({
   imports: [
     configModule,
-    MongooseModule.forRoot(
-      process.env.MONGO_URL_LOCAL ??
-        'mongodb://localhost:27017/nest-blogger-platform',
-    ),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'swagger-static'),
-      serveRoot: process.env.NODE_ENV === 'development' ? '/' : '/swagger',
+    CoreModule,
+    MongooseModule.forRootAsync({
+      inject: [CoreConfig],
+      useFactory: (coreConfig: CoreConfig) => ({
+        uri: coreConfig.mongoURI,
+      }),
+    }),
+    ServeStaticModule.forRootAsync({
+      inject: [CoreConfig],
+      useFactory: (coreConfig: CoreConfig) => [
+        {
+          rootPath: join(__dirname, '..', 'swagger-static'),
+          serveRoot: coreConfig.isSwaggerEnabled ? '/' : '/swagger',
+        },
+      ],
     }),
     ThrottlerModule.forRoot([{ ttl: 10, limit: 5 }]), // окно в секундах // максимум запросов
     BloggersPlatformModule,
     UserAccountsModule,
     AuthModule,
     EmailModule,
-    TestingModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    //регистрация глобальных exception filters
+    //важен порядок регистрации! Первым сработает DomainHttpExceptionsFilter!
+    //https://docs.nestjs.com/exception-filters#binding-filters
+    {
+      provide: APP_FILTER,
+      useClass: AllHttpExceptionsFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: DomainHttpExceptionsFilter,
+    },
+  ],
 })
-export class AppModule {}
-console.log('✅ Оно работает, можно пока прочитать молитву духу машины');
+export class AppModule {
+  static forRoot(coreConfig: CoreConfig): DynamicModule {
+    // такой мудрёный способ мы используем, чтобы добавить к основным модулям необязательный модуль.
+    // чтобы не обращаться в декораторе к переменной окружения через process.env в декораторе, потому что
+    // запуск декораторов происходит на этапе склейки всех модулей до старта жизненного цикла самого NestJS
+
+    return {
+      module: AppModule,
+      imports: [...(coreConfig.includeTestingModule ? [TestingModule] : [])],
+    };
+  }
+}

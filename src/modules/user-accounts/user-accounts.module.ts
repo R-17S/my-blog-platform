@@ -18,7 +18,6 @@ import { UserAccountsConfig } from './config/user-accounts.config';
 
 @Module({
   imports: [
-    UserAccountsConfig,
     CqrsModule,
     MongooseModule.forFeature([
       { name: User.name, schema: UserEntity },
@@ -39,12 +38,15 @@ import { UserAccountsConfig } from './config/user-accounts.config';
     DeleteAllDevicesExceptCurrentUseCase,
     //
     ArgonService,
+    //
+    UserAccountsConfig,
   ],
   exports: [
     UsersRepository,
     SecurityDevicesRepository,
     //UsersService,
     ArgonService,
+    UserAccountsConfig,
   ],
 })
 export class UserAccountsModule {}

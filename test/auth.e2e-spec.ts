@@ -1,19 +1,12 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { UsersTestManager } from './helpers/users-test-manager';
 import { initSettings } from './helpers/init-settings';
-import { JwtService } from '@nestjs/jwt';
 import { deleteAllData } from './helpers/delete-all-data';
 import { CreateUserDto } from '../src/modules/user-accounts/dto/create-user.dto';
 import * as request from 'supertest';
 import { GLOBAL_PREFIX } from '../src/setup/global-prefix.setup';
 import { UserViewModel } from '../src/modules/user-accounts/api/view-dto/users.view-dto';
 import { EmailService } from '../src/modules/user-accounts/application/email.service';
-import {
-  ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
-  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
-} from '../src/modules/user-accounts/constans/auth-tokens.inject-constants';
-import { CoreConfig } from '../src/core/core.config';
-import { UserAccountsConfig } from '../src/modules/user-accounts/config/user-accounts.config';
 
 describe('auth', () => {
   let app: INestApplication;
@@ -21,20 +14,20 @@ describe('auth', () => {
 
   beforeAll(async () => {
     const result = await initSettings((moduleBuilder) => {
-      moduleBuilder
-        .overrideProvider(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
-        .useFactory({
-          factory: (
-            coreConfig: CoreConfig,
-            userAccountsConfig: UserAccountsConfig,
-          ) => {
-            return new JwtService({
-              secret: coreConfig.refreshTokenSecret,
-              signOptions: { expiresIn: '2s' },
-            });
-          },
-          inject: [CoreConfig, UserAccountsConfig],
-        });
+      // moduleBuilder
+      //   .overrideProvider(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
+      //   .useFactory({
+      //     factory: (
+      //       coreConfig: CoreConfig,
+      //       userAccountsConfig: UserAccountsConfig,
+      //     ) => {
+      //       return new JwtService({
+      //         secret: coreConfig.refreshTokenSecret,
+      //         signOptions: { expiresIn: '2s' },
+      //       });
+      //     },
+      //     inject: [CoreConfig, UserAccountsConfig],
+      //   });
 
       moduleBuilder.overrideProvider(EmailService).useValue({
         sendRegistrationEmail: jest.fn().mockResolvedValue(true),

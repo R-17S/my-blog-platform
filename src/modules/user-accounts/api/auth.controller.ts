@@ -115,10 +115,12 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtRefreshAuthGuard)
   async refreshTokens(
+    @Req() req: Request,
     @ExtractUserFromRequest() user: UserCookiesDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
-    //console.log('🔥 [Refresh] cookies:', req.cookies);
+    console.log('req.headers.cookie:', req.headers.cookie);
+    console.log('🔥 [Refresh] cookies:', req.cookies);
     console.log('🔥 [Refresh] user from token:', user);
     const { accessToken, refreshToken } = await this.commandBus.execute<
       any,

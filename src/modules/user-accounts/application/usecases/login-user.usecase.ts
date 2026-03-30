@@ -67,7 +67,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
       login: user.login,
     });
 
-    console.log('refreshToken', refreshToken);
+    // console.log('refreshToken', refreshToken);
 
     return {
       accessToken,

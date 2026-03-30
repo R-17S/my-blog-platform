@@ -1,9 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import { UserCookiesDto } from '../dto/user-cookies.dto';
 import { AuthService } from '../../application/auth.service';
+import { CoreConfig } from '../../../../core/core.config';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -13,15 +14,26 @@ export class JwtRefreshStrategy extends PassportStrategy(
   constructor(
     //@Inject(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
     private readonly authService: AuthService,
+    private readonly coreConfig: CoreConfig,
   ) {
+    console.log('🔥 [Strategy] I AM LOADED');
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: Request) => {
-          return req?.cookies?.refreshToken;
+          console.log('🔥 [Extractor] req.headers.cookie:', req.headers.cookie);
+          const raw = req.headers.cookie;
+          if (!raw) return null;
+
+          const cookies = Object.fromEntries(
+            raw.split(';').map((v) => v.trim().split('=')),
+          );
+          console.log('🔥 [Extractor] parsed cookies:', cookies);
+
+          return cookies['refreshToken'] ?? null;
         },
       ]),
       ignoreExpiration: true,
-      secretOrKey: 'refresh-token-secret',
+      secretOrKey: coreConfig.refreshTokenSecret,
       passReqToCallback: true,
     });
   }

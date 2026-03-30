@@ -52,7 +52,9 @@ import { UserAccountsConfig } from './config/user-accounts.config';
       ): JwtService => {
         return new JwtService({
           secret: coreConfig.accessTokenSecret, //TODO: move to env. will be in the following lessons
-          signOptions: { expiresIn: userAccountsConfig.accessTokenExpireIn },
+          signOptions: {
+            expiresIn: userAccountsConfig.accessTokenExpireIn as any,
+          },
         });
       },
       inject: [
@@ -69,7 +71,9 @@ import { UserAccountsConfig } from './config/user-accounts.config';
       ): JwtService => {
         return new JwtService({
           secret: coreConfig.refreshTokenSecret, //TODO: move to env. will be in the following lessons
-          signOptions: { expiresIn: userAccountsConfig.refreshTokenExpireIn },
+          signOptions: {
+            expiresIn: userAccountsConfig.refreshTokenExpireIn as any,
+          },
         });
       },
       inject: [

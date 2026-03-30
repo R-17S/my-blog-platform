@@ -11,7 +11,7 @@ export class SecurityDevicesRepository {
   ) {}
 
   async save(device: DevicesDocument): Promise<void> {
-    console.log('saving device:', device);
+    // console.log('saving device:', device);
     await device.save();
   }
 

@@ -25,6 +25,20 @@ window.onload = function() {
           ]
         }
       },
+      "/api/testing/all-data": {
+        "delete": {
+          "operationId": "TestingController_deleteAllData",
+          "parameters": [],
+          "responses": {
+            "204": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Testing"
+          ]
+        }
+      },
       "/api/blogs": {
         "get": {
           "operationId": "BlogsController_getBlogs",
@@ -782,20 +796,6 @@ window.onload = function() {
           },
           "tags": [
             "Auth"
-          ]
-        }
-      },
-      "/api/testing/all-data": {
-        "delete": {
-          "operationId": "TestingController_deleteAllData",
-          "parameters": [],
-          "responses": {
-            "204": {
-              "description": ""
-            }
-          },
-          "tags": [
-            "Testing"
           ]
         }
       }

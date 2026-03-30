@@ -1,36 +1,34 @@
 import { Test, TestingModuleBuilder } from '@nestjs/testing';
-import { getConnectionToken } from '@nestjs/mongoose';
-import { Connection } from 'mongoose';
-
 // пример: моки для сервисов
 
 import { appSetup } from '../../src/setup/app.setup';
 import { EmailService } from '../../src/modules/user-accounts/application/email.service';
 import { EmailServiceMock } from '../mock/email-service.mock';
 import { deleteAllData } from './delete-all-data';
-import { AppModule } from '../../src/app.module';
+
 import { UsersTestManager } from './users-test-manager';
+import { initAppModule } from '../../src/init-app-module';
 
 export const initSettings = async (
   addSettingsToModuleBuilder?: (moduleBuilder: TestingModuleBuilder) => void,
 ) => {
-  let moduleBuilder: TestingModuleBuilder = Test.createTestingModule({
-    imports: [AppModule],
-  });
+  const DynamicAppModule = await initAppModule();
+  const testingModuleBuilder: TestingModuleBuilder = Test.createTestingModule({
+    imports: [DynamicAppModule],
+  })
 
-  // ✅ подмена EmailService на мок
-  moduleBuilder = moduleBuilder
+    // ✅ подмена EmailService на мок
     .overrideProvider(EmailService)
     .useClass(EmailServiceMock);
 
   // ✅ если нужно, можно добавить кастомные override
   if (addSettingsToModuleBuilder) {
-    addSettingsToModuleBuilder(moduleBuilder);
+    addSettingsToModuleBuilder(testingModuleBuilder);
   }
 
   let app;
   try {
-    const testingAppModule = await moduleBuilder.compile();
+    const testingAppModule = await testingModuleBuilder.compile();
     app = testingAppModule.createNestApplication();
 
     console.log('🔥 INIT: calling appSetup...');

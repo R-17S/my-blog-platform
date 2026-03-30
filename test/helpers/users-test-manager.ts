@@ -49,11 +49,11 @@ export class UsersTestManager {
     password: string,
     statusCode: number = HttpStatus.OK,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    console.log(
-      '🔥 [TestManager] данные вообще приходят ',
-      loginOrEmail,
-      password,
-    );
+    // console.log(
+    //   '🔥 [TestManager] данные вообще приходят ',
+    //   loginOrEmail,
+    //   password,
+    // );
     const response = await request(this.app.getHttpServer())
       .post(`/${GLOBAL_PREFIX}/auth/login`)
       .send({ loginOrEmail, password })
@@ -64,6 +64,7 @@ export class UsersTestManager {
     const refreshToken = response.headers['set-cookie'][0]
       .split(';')[0]
       .replace('refreshToken=', '');
+    // console.log('🔥 [Login] set-cookie:', response.headers['set-cookie']);
     return { accessToken, refreshToken };
   }
 

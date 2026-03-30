@@ -7,11 +7,13 @@ import {
 import { DomainExceptionCode } from '../domain-exception-codes';
 import { ErrorResponseBody } from './error-response-body.type';
 import { Response, Request } from 'express';
+import { CoreConfig } from '../../core.config';
 
 //Все ошибки
 @Catch()
 export class AllHttpExceptionsFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost): void {
+  constructor(private coreConfig: CoreConfig) {}
+  catch(exception: any, host: ArgumentsHost): void {
     //ctx нужен, чтобы получить request и response (express). Это из документации, делаем по аналогии
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -33,9 +35,8 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
     message: string,
   ): ErrorResponseBody {
     //TODO: Replace with getter from configService. will be in the following lessons
-    const isProduction = process.env.NODE_ENV === 'production';
 
-    if (isProduction) {
+    if (!this.coreConfig.sendInternalServerErrorDetails) {
       return {
         timestamp: new Date().toISOString(),
         path: null,

@@ -2,14 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserContextDto } from '../dto/user-context.dto';
+import { CoreConfig } from '../../../../core/core.config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor() {
+  constructor(private readonly coreConfig: CoreConfig) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'access-token-secret', //TODO: move to env. will be in the following lessons
+      secretOrKey: coreConfig.accessTokenSecret, //TODO: move to env. will be in the following lessons
     });
   }
 
