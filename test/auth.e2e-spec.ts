@@ -7,6 +7,7 @@ import * as request from 'supertest';
 import { GLOBAL_PREFIX } from '../src/setup/global-prefix.setup';
 import { UserViewModel } from '../src/modules/user-accounts/api/view-dto/users.view-dto';
 import { EmailService } from '../src/modules/user-accounts/application/email.service';
+import { delay } from './helpers/delay';
 
 describe('auth', () => {
   let app: INestApplication;
@@ -130,6 +131,18 @@ describe('auth', () => {
       .set('Cookie', `refreshToken=${refreshToken}`)
       .expect(HttpStatus.NO_CONTENT);
     await userTestManager.getDevices(refreshToken, HttpStatus.UNAUTHORIZED);
+  });
+
+  it('Тест инкубатора для рефрешТокена', async () => {
+    const { accessToken, refreshToken } =
+      await userTestManager.createAndLoginSingleUser();
+
+    await delay(2000);
+
+    await request(app.getHttpServer())
+      .post(`/${GLOBAL_PREFIX}/auth/logout`)
+      .set('Cookie', `refreshToken=${refreshToken}`)
+      .expect(HttpStatus.UNAUTHORIZED);
   });
 });
 

@@ -5,6 +5,8 @@ import { Request } from 'express';
 import { UserCookiesDto } from '../dto/user-cookies.dto';
 import { AuthService } from '../../application/auth.service';
 import { CoreConfig } from '../../../../core/core.config';
+import { DomainException } from '../../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -45,6 +47,16 @@ export class JwtRefreshStrategy extends PassportStrategy(
     //const token = req.cookies?.refreshToken;
     console.log('🔥 [Strategy] cookies:', req.cookies);
     console.log('🔥 [Strategy] payload:', payload);
+    // const now = Math.floor(Date.now() / 1000);
+    //
+    // if (payload.exp < now) {
+    //   console.log('🔥 Token expired');
+    //   throw new DomainException({
+    //     code: DomainExceptionCode.Unauthorized,
+    //     message: 'Refresh token expired',
+    //     extensions: [{ key: 'payload.exp', message: 'Refresh token expired' }],
+    //   });
+    // }
     await this.authService.checkRefreshToken(payload.deviceId, payload.iat);
     // payload содержит id и deviceId
     //return { payload, token };

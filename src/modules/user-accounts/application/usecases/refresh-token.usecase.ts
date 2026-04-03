@@ -73,6 +73,10 @@ export class RefreshTokensUseCase
     // 4. Обновляем lastActiveDate устройства
     device.updateLastActive(new Date());
     await this.securityDevicesRepository.save(device);
+    console.log(
+      '🔥 newRefreshToken payload:',
+      this.refreshTokenService.decode(newRefreshToken),
+    );
 
     return { accessToken, refreshToken: newRefreshToken };
   }
