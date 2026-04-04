@@ -13,9 +13,10 @@ import { AuthModule } from './modules/user-accounts/auth.module';
 import { EmailModule } from './modules/user-accounts/email.module';
 import { CoreConfig } from './core/core.config';
 import { CoreModule } from './core/core.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
 import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
+import { PostRateLimitGuard } from './modules/user-accounts/guards/throttler/rateLimit-auth.guard';
 
 @Module({
   imports: [
@@ -55,6 +56,10 @@ import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exception
     {
       provide: APP_FILTER,
       useClass: DomainHttpExceptionsFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PostRateLimitGuard,
     },
   ],
 })
