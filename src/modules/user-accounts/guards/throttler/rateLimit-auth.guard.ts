@@ -18,14 +18,15 @@ export class PostRateLimitGuard extends ThrottlerGuard {
   protected getTracker(req: Record<string, any>): Promise<string> {
     // трекаем по IP
     // return Promise.resolve(req.ip as string);
-    const ip =
-      req.headers['x-forwarded-for'] ||
-      req.connection?.remoteAddress ||
-      req.socket?.remoteAddress ||
-      req.ip ||
-      'unknown';
-
-    return Promise.resolve(ip);
+    return Promise.resolve('global-ip');
+    // const ip =
+    //   req.headers['x-forwarded-for'] ||
+    //   req.connection?.remoteAddress ||
+    //   req.socket?.remoteAddress ||
+    //   req.ip ||
+    //   'unknown';
+    //
+    // return Promise.resolve(ip);
   }
 
   protected getLimit(context: ExecutionContext): number {
