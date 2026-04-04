@@ -38,7 +38,7 @@ import { UserCookiesDto } from '../guards/dto/user-cookies.dto';
 import { LogoutUserCommand } from '../application/usecases/logout-user.usecase';
 
 @Controller('auth')
-@UseGuards(PostRateLimitGuard)
+// @UseGuards(PostRateLimitGuard)
 export class AuthController {
   constructor(
     //private usersService: UsersService,
