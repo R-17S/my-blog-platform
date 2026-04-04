@@ -6,7 +6,16 @@ import { DomainExceptionCode } from '../../../../core/exceptions/domain-exceptio
 
 @Injectable()
 export class PostRateLimitGuard extends ThrottlerGuard {
-  protected async getTracker(req: Record<string, any>): Promise<string> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    // вызываем throttler
+    const result = await super.canActivate(context);
+    console.log('🔥 throttler called');
+
+    // если throttler сказал "нельзя" — он сам бросит исключение
+    return result;
+  }
+
+  protected getTracker(req: Record<string, any>): Promise<string> {
     // трекаем по IP
     return Promise.resolve(req.ip as string);
   }
@@ -33,6 +42,9 @@ export class PostRateLimitGuard extends ThrottlerGuard {
     throw new DomainException({
       code: DomainExceptionCode.TooManyRequests,
       message: 'More than 5 attempts from one IP-address during 10 seconds',
+      extensions: [
+        { key: 'throwThrottlingException', message: 'TooManyRequests' },
+      ],
     });
   }
 }
