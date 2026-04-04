@@ -8,7 +8,7 @@ import { UserAccountsModule } from './modules/user-accounts/user-accounts.module
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './modules/user-accounts/auth.module';
 import { EmailModule } from './modules/user-accounts/email.module';
 import { CoreConfig } from './core/core.config';
@@ -37,7 +37,14 @@ import { PostRateLimitGuard } from './modules/user-accounts/guards/throttler/rat
         },
       ],
     }),
-    ThrottlerModule.forRoot([{ ttl: 10, limit: 5 }]), // окно в секундах // максимум запросов
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 10,
+          limit: 5,
+        },
+      ],
+    }), // окно в секундах // максимум запросов
     BloggersPlatformModule,
     UserAccountsModule,
     AuthModule,
@@ -59,7 +66,7 @@ import { PostRateLimitGuard } from './modules/user-accounts/guards/throttler/rat
     },
     {
       provide: APP_GUARD,
-      useClass: PostRateLimitGuard,
+      useClass: ThrottlerGuard,
     },
   ],
 })
